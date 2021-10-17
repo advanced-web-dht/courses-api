@@ -3,10 +3,9 @@ import { SequelizeModuleOptions } from '@nestjs/sequelize';
 import { Dialect } from 'sequelize/types';
 import { readFileSync } from 'fs';
 
-const dbCA = [readFileSync('/Users/ntduyfit/Documents/A_Web/courses/courses-api/db-ssl.pem', 'utf8')];
-
 export default registerAs('sequelize.config', (): SequelizeModuleOptions => {
 	const dialect = process.env.DB_DIALECT as Dialect;
+	const dbCA = [readFileSync(process.env.DB_SSL_PATH, 'utf8')];
 	return {
 		username: process.env.DB_USER,
 		password: process.env.DB_PASS,
