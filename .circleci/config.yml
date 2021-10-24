@@ -1,0 +1,20 @@
+version: 2.1
+jobs:
+    deploy-production:
+        machine:
+            enabled: true
+        steps:
+            - run:
+                name: Deploy over SSH
+                command: ssh -p $SSH_PORT $SSH_USERNAME@$SSH_HOST "sh ~/deployAPI.sh";
+                no_output_timeout: 30m
+
+workflows:
+    version: 2
+    deploy:
+        jobs:
+            - deploy-production:
+                filters:
+                    branches:
+                        only:
+                            - main
