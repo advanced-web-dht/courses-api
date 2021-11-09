@@ -7,6 +7,10 @@ import { Account } from './account.entity';
 export class AccountService {
 	constructor(
 		@InjectModel(Account)
-		private classModel: typeof Account
+		private accountModel: typeof Account
 	) {}
+	async findUser(username: string): Promise<Account> {
+		const account = await this.accountModel.findOne({ where: { username: username } });
+		return account;
+	}
 }
