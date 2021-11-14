@@ -3,6 +3,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import { nanoid } from 'nanoid';
 
 import { Class } from './class.entity';
+import { ClassAccount } from '../entities/class-account.entity';
+import { Account } from '../account/account.entity';
 import { createClassDto } from './class.dto/create-class.dto';
 
 @Injectable()
@@ -26,7 +28,16 @@ export class ClassService {
 		}
 	}
 
-	async getAll(): Promise<Class[]> {
-		return await this.classModel.findAll();
+	async getAll(userId): Promise<Class[]> {
+		return await this.classModel.findAll({
+			include: [
+				{
+					model: Account,
+					where: {
+						id: userId
+					}
+				}
+			]
+		});
 	}
 }

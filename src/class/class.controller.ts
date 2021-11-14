@@ -1,17 +1,20 @@
-import { Controller, Get, Post, Body, Res } from '@nestjs/common';
-import { FastifyReply } from 'fastify';
+import { Controller, Get, Post, Body, Res, UseGuards, Req } from '@nestjs/common';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 import { ClassService } from './class.service';
 import { Class } from './class.entity';
 import { createClassDto } from './class.dto/create-class.dto';
+import { AuthGuard } from '@nestjs/passport';
 
+@UseGuards(AuthGuard('jwt'))
 @Controller('classes')
 export class ClassController {
 	constructor(private readonly classService: ClassService) {}
 
 	@Get()
-	async GetAllClasses(): Promise<Class[]> {
-		return this.classService.getAll();
+	async GetAllClasses(@Req() req: FastifyRequest): Promise<Class[]> {
+		const result = await this.classService.getAll(req.user.id);
+		return result;
 	}
 
 	@Post()

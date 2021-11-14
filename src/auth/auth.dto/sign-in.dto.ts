@@ -1,9 +1,12 @@
 import { IsString } from 'class-validator';
 
-export class signInDto {
+export class SignInGoogleDto {
 	@IsString()
-	username: string;
+	email: string;
 
 	@IsString()
-	password: string;
+	name: string;
+
+	@IsString()
+	accessToken: string;
 }
