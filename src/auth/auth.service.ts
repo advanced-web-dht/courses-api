@@ -60,6 +60,7 @@ export class AuthService {
 				}
 			}
 		} catch (e) {
+			console.log('> here');
 			throw new UnauthorizedException();
 		}
 	}
