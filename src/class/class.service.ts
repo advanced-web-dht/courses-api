@@ -11,7 +11,9 @@ import { createClassDto } from './class.dto/create-class.dto';
 export class ClassService {
 	constructor(
 		@InjectModel(Class)
-		private classModel: typeof Class
+		private classModel: typeof Class,
+		@InjectModel(ClassAccount)
+		private classAccountModel: typeof ClassAccount
 	) {}
 
 	async CreateClass({ name }: createClassDto): Promise<Class> {
@@ -39,5 +41,15 @@ export class ClassService {
 				}
 			]
 		});
+	}
+
+	async CreateAccountClass(AccountId: number, ClassId: number) {
+		const classToAdd = {
+			accountId: AccountId,
+			classId: ClassId,
+			role: 'owner'
+		};
+		const newClass = await this.classAccountModel.create(classToAdd);
+		return newClass;
 	}
 }

@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import * as bcrypt from 'bcrypt';
 
 import { AccountService } from '../account/account.service';
@@ -13,11 +13,9 @@ export class AuthService {
 
 	async validateUser(username: string, password: string): Promise<AccountLogin | null> {
 		const user = await this.accountService.findUser(username);
-		//const saltOrRounds = 10;
-		//const hash = await bcrypt.hash(pass, saltOrRounds);
-		if (user && user.password === password) {
-			//bcrypt.compare(user.password, hash)
-
+		const saltOrRounds = 10;
+		const hash = await bcrypt.hash(password, saltOrRounds);
+		if (user && bcrypt.compare(user.password, hash)) {
 			return { name: user.name, username: user.username, id: user.id };
 		}
 		return null;
@@ -33,7 +31,7 @@ export class AuthService {
 	async verifyAccessToken(payload: SignInGoogleDto): Promise<Record<string, string>> {
 		const url = `https://oauth2.googleapis.com/tokeninfo?accessToken=${payload.accessToken}`;
 		try {
-			const { data } = await axios.get(url);
+			const { data }: AxiosResponse = await axios.get(url);
 			if (data.email === payload.email && parseInt(data.expires_in) > 0) {
 				const user = await this.accountService.getAccountByEmail(payload.email);
 				if (user) {
@@ -59,6 +57,23 @@ export class AuthService {
 					};
 				}
 			}
+		} catch (e) {
+			console.log('> here');
+			throw new UnauthorizedException();
+		}
+	}
+	async registerUser(userInfo): Promise<unknown> {
+		const saltOrRounds = 10;
+		const hash = await bcrypt.hash(userInfo.password, saltOrRounds);
+		console.log(userInfo.username);
+		try {
+			const newUser = await this.accountService.createAccount(
+				userInfo.name,
+				userInfo.email,
+				hash,
+				userInfo.username
+			);
+			return { isSuccess: true };
 		} catch (e) {
 			console.log('> here');
 			throw new UnauthorizedException();

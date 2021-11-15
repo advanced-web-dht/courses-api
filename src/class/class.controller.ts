@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Res, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Res, UseGuards, Request } from '@nestjs/common';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
 import { ClassService } from './class.service';
@@ -12,15 +12,16 @@ export class ClassController {
 	constructor(private readonly classService: ClassService) {}
 
 	@Get()
-	async GetAllClasses(@Req() req: FastifyRequest): Promise<Class[]> {
+	async GetAllClasses(@Request() req: FastifyRequest): Promise<Class[]> {
 		const result = await this.classService.getAll(req.user.id);
 		return result;
 	}
 
 	@Post()
-	async AddClass(@Res() res: FastifyReply, @Body() payload: createClassDto): Promise<void> {
+	async AddClass(@Res() res: FastifyReply, @Body() payload: createClassDto, @Request() req): Promise<void> {
 		try {
 			const newClass = await this.classService.CreateClass(payload);
+			await this.classService.CreateAccountClass(req.user.id, newClass.id);
 			res.status(200).send(newClass);
 		} catch (e) {
 			res.status(500).send(e.message);

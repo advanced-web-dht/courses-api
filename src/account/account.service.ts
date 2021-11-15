@@ -28,4 +28,14 @@ export class AccountService {
 		const newAccount = await this.accountModel.create(info);
 		return newAccount;
 	}
+	async createAccount(name: string, email: string, password: string, username: string): Promise<Account> {
+		const info = {
+			name,
+			email,
+			password,
+			username
+		};
+		const newAccount = await this.accountModel.create(info);
+		return newAccount;
+	}
 }

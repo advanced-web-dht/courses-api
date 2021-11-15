@@ -17,6 +17,10 @@ declare module 'fastify' {
 export class AuthController {
 	constructor(private authService: AuthService, private accountService: AccountService) {}
 
+	@Post('/register')
+	async register(@Body() req) {
+		return this.authService.registerUser(req);
+	}
 	@Post('/signin/google')
 	async loginGoogle(@Body() payload: SignInGoogleDto) {
 		return this.authService.verifyAccessToken(payload);
