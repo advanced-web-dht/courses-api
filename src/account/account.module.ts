@@ -8,6 +8,7 @@ import { AccountController } from './account.controller';
 @Module({
 	imports: [SequelizeModule.forFeature([Account])],
 	controllers: [AccountController],
-	providers: [AccountService]
+	providers: [AccountService],
+	exports: [AccountService]
 })
 export class AccountModule {}

@@ -9,17 +9,19 @@ import { AppService } from './app.service';
 import { EntityModule } from './entities/entity.module';
 import { ClassModule } from './class/class.module';
 import { AccountModule } from './account/account.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
 	imports: [
-		ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env', load: [databaseConfigProd, databaseConfigDev] }),
+		ConfigModule.forRoot({ isGlobal: true, load: [databaseConfigProd, databaseConfigDev] }),
 		SequelizeModule.forRootAsync({
 			imports: [ConfigModule],
 			useFactory: process.env.NODE_ENV === 'development' ? databaseConfigDev : databaseConfigProd
 		}),
 		EntityModule,
 		ClassModule,
-		AccountModule
+		AccountModule,
+		AuthModule
 	],
 	controllers: [AppController],
 	providers: [AppService]

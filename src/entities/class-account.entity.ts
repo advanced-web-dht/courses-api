@@ -12,6 +12,6 @@ export class ClassAccount extends Model {
 	@Column({ primaryKey: true })
 	accountId: number;
 
-	@Column({ type: DataType.ENUM('student', 'teacher') })
+	@Column({ type: DataType.ENUM('owner', 'student', 'teacher') })
 	role: string;
 }

@@ -3,13 +3,17 @@ import { InjectModel } from '@nestjs/sequelize';
 import { nanoid } from 'nanoid';
 
 import { Class } from './class.entity';
+import { ClassAccount } from '../entities/class-account.entity';
+import { Account } from '../account/account.entity';
 import { createClassDto } from './class.dto/create-class.dto';
 
 @Injectable()
 export class ClassService {
 	constructor(
 		@InjectModel(Class)
-		private classModel: typeof Class
+		private classModel: typeof Class,
+		@InjectModel(ClassAccount)
+		private classAccountModel: typeof ClassAccount
 	) {}
 
 	async CreateClass({ name }: createClassDto): Promise<Class> {
@@ -26,7 +30,26 @@ export class ClassService {
 		}
 	}
 
-	async getAll(): Promise<Class[]> {
-		return await this.classModel.findAll();
+	async getAll(userId): Promise<Class[]> {
+		return await this.classModel.findAll({
+			include: [
+				{
+					model: Account,
+					where: {
+						id: userId
+					}
+				}
+			]
+		});
+	}
+
+	async CreateAccountClass(AccountId: number, ClassId: number) {
+		const classToAdd = {
+			accountId: AccountId,
+			classId: ClassId,
+			role: 'owner'
+		};
+		const newClass = await this.classAccountModel.create(classToAdd);
+		return newClass;
 	}
 }

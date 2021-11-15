@@ -17,11 +17,11 @@ export class Account extends Model {
 	@Column({ type: DataType.STRING(50), allowNull: false })
 	name: string;
 
-	@Column({ defaultValue: true })
-	status: boolean;
+	@Column({ type: DataType.STRING(15) })
+	studentId: string;
 
-	@Column({ defaultValue: false })
-	isDeleted: boolean;
+	@Column({ type: DataType.ENUM('active', 'inactive', 'blocked', 'deleted'), defaultValue: 'active' })
+	status: string;
 
 	@BelongsToMany(() => Class, () => ClassAccount)
 	classes: Array<Class & { ClassAccount: ClassAccount }>;
