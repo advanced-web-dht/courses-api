@@ -58,7 +58,6 @@ export class AuthService {
 				}
 			}
 		} catch (e) {
-			console.log('> here');
 			throw new UnauthorizedException();
 		}
 	}
@@ -75,7 +74,6 @@ export class AuthService {
 			);
 			return { isSuccess: true };
 		} catch (e) {
-			console.log('> here');
 			throw new UnauthorizedException();
 		}
 	}

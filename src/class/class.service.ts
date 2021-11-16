@@ -30,7 +30,7 @@ export class ClassService {
 		}
 	}
 
-	async getAll(userId): Promise<Class[]> {
+	async getAll(userId: number): Promise<Class[]> {
 		return await this.classModel.findAll({
 			include: [
 				{
@@ -43,13 +43,25 @@ export class ClassService {
 		});
 	}
 
-	async CreateAccountClass(AccountId: number, ClassId: number) {
+	async CreateAccountClass(AccountId: number, ClassId: number): Promise<void> {
 		const classToAdd = {
 			accountId: AccountId,
 			classId: ClassId,
 			role: 'owner'
 		};
-		const newClass = await this.classAccountModel.create(classToAdd);
-		return newClass;
+		await this.classAccountModel.create(classToAdd);
+	}
+
+	async getClassByCode(code: string): Promise<Class> {
+		try {
+			const result = await this.classModel.findOne({
+				where: {
+					code: code
+				}
+			});
+			return result;
+		} catch (err) {
+			return null;
+		}
 	}
 }
