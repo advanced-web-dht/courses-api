@@ -4,9 +4,11 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Class } from './class.entity';
 import { ClassService } from './class.service';
 import { ClassController } from './class.controller';
+import { AuthModule } from '../auth/auth.module';
+import { ClassAccount } from '../entities/class-account.entity';
 
 @Module({
-	imports: [SequelizeModule.forFeature([Class])],
+	imports: [SequelizeModule.forFeature([Class]), SequelizeModule.forFeature([ClassAccount]), AuthModule],
 	controllers: [ClassController],
 	providers: [ClassService]
 })

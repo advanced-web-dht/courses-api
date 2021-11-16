@@ -1,23 +1,44 @@
-import { Controller, Get, Post, Body, Res } from '@nestjs/common';
-import { FastifyReply } from 'fastify';
+import {
+	Controller,
+	Get,
+	Post,
+	Body,
+	Res,
+	UseGuards,
+	Request,
+	Query,
+	UnauthorizedException,
+	Param
+} from '@nestjs/common';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 import { ClassService } from './class.service';
 import { Class } from './class.entity';
 import { createClassDto } from './class.dto/create-class.dto';
+import { AuthGuard } from '@nestjs/passport';
 
-@Controller('/classes')
+@UseGuards(AuthGuard('jwt'))
+@Controller('classes')
 export class ClassController {
-	constructor(private readonly appService: ClassService) {}
+	constructor(private readonly classService: ClassService) {}
 
 	@Get()
-	async GetAllClasses(): Promise<Class[]> {
-		return this.appService.getAll();
+	async GetAllClasses(@Request() req: FastifyRequest): Promise<Class[]> {
+		const result = await this.classService.getAll(req.user.id);
+		return result;
+	}
+
+	@Get('/:code')
+	async GetClass(@Param('code') code: string): Promise<Class> {
+		const result = await this.classService.getClassByCode(code);
+		return result;
 	}
 
 	@Post()
-	async AddClass(@Res() res: FastifyReply, @Body() payload: createClassDto): Promise<void> {
+	async AddClass(@Res() res: FastifyReply, @Body() payload: createClassDto, @Request() req): Promise<void> {
 		try {
-			const newClass = await this.appService.CreateClass(payload);
+			const newClass = await this.classService.CreateClass(payload);
+			await this.classService.CreateAccountClass(req.user.id, newClass.id);
 			res.status(200).send(newClass);
 		} catch (e) {
 			res.status(500).send(e.message);
