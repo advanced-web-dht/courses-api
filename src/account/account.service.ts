@@ -28,6 +28,7 @@ export class AccountService {
 		const newAccount = await this.accountModel.create(info);
 		return newAccount;
 	}
+
 	async createAccount(name: string, email: string, password: string, username: string): Promise<Account> {
 		const info = {
 			name,
@@ -37,5 +38,29 @@ export class AccountService {
 		};
 		const newAccount = await this.accountModel.create(info);
 		return newAccount;
+	}
+
+	async checkEmailExisted(email: string): Promise<boolean> {
+		try {
+			const account = await this.accountModel.findOne({ where: { email: email } });
+			if (account) {
+				return true;
+			}
+			return false;
+		} catch (e) {
+			return false;
+		}
+	}
+
+	async checkUsernameExisted(username: string): Promise<boolean> {
+		try {
+			const account = await this.accountModel.findOne({ where: { username: username } });
+			if (account) {
+				return true;
+			}
+			return false;
+		} catch (e) {
+			return false;
+		}
 	}
 }
