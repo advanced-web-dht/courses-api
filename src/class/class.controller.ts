@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Res, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Res, Param, Request } from '@nestjs/common';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
 import { ClassService } from './class.service';
@@ -6,7 +6,7 @@ import { Class } from './class.entity';
 import { createClassDto } from './class.dto/create-class.dto';
 import { AuthGuard } from '@nestjs/passport';
 
-@UseGuards(AuthGuard('jwt'))
+// @UseGuards(AuthGuard('jwt'))
 @Controller('classes')
 export class ClassController {
 	constructor(private readonly classService: ClassService) {}
@@ -26,5 +26,9 @@ export class ClassController {
 		} catch (e) {
 			res.status(500).send(e.message);
 		}
+	}
+	@Get('/:classId/:role')
+	async register(@Param() params) {
+		return this.classService.getMemberByRole(params.classId, params.role);
 	}
 }

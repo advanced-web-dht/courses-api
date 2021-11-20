@@ -52,4 +52,24 @@ export class ClassService {
 		const newClass = await this.classAccountModel.create(classToAdd);
 		return newClass;
 	}
+	async getMemberByRole(id: number, role: string): Promise<Account[]> {
+		const result = await this.classModel.findOne({
+			where: {
+				id: id
+			},
+			include: [
+				{
+					model: Account,
+					attributes: ['id', 'name'],
+					through: {
+						where: {
+							role: role
+						},
+						attributes: []
+					}
+				}
+			]
+		});
+		return result.members;
+	}
 }
