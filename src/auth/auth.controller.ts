@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import { AccountService } from '../account/account.service';
 import { AccountLogin } from './auth.interface';
 import { SignInGoogleDto } from './auth.dto/sign-in.dto';
+import { MailService } from '../mail/mail.service';
 
 declare module 'fastify' {
 	interface FastifyRequest {
@@ -15,7 +16,11 @@ declare module 'fastify' {
 
 @Controller('auth')
 export class AuthController {
-	constructor(private authService: AuthService, private accountService: AccountService) {}
+	constructor(
+		private authService: AuthService,
+		private accountService: AccountService,
+		private emailService: MailService
+	) {}
 
 	@Post('/register')
 	async register(@Body() req) {
@@ -34,7 +39,7 @@ export class AuthController {
 
 	@UseGuards(AuthGuard('jwt'))
 	@Get('/profile')
-	async getProfile(@Request() req): Promise<unknown> {
+	async getProfile(@Request() req: FastifyRequest): Promise<unknown> {
 		const user = await this.accountService.findUser(req.user.username);
 		const { password, ...result } = user;
 		return result;

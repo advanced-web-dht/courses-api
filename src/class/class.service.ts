@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { nanoid } from 'nanoid';
 
 import { Class } from './class.entity';
-import { ClassAccount } from '../entities/class-account.entity';
+import { ClassAccount, Role } from '../entities/class-account.entity';
 import { Account } from '../account/account.entity';
 import { createClassDto } from './class.dto/create-class.dto';
 
@@ -43,12 +43,13 @@ export class ClassService {
 		});
 	}
 
-	async CreateAccountClass(AccountId: number, ClassId: number): Promise<void> {
+	async AddMember(AccountId: number, ClassId: number, role: Role): Promise<void> {
 		const classToAdd = {
 			accountId: AccountId,
 			classId: ClassId,
-			role: 'owner'
+			role: role
 		};
+		console.log(classToAdd);
 		await this.classAccountModel.create(classToAdd);
 	}
 
@@ -63,5 +64,25 @@ export class ClassService {
 		} catch (err) {
 			return null;
 		}
+	}
+	async getMemberByRole(id: number, role: string): Promise<Account[]> {
+		const result = await this.classModel.findOne({
+			where: {
+				id: id
+			},
+			include: [
+				{
+					model: Account,
+					attributes: ['id', 'name'],
+					through: {
+						where: {
+							role: role
+						},
+						attributes: []
+					}
+				}
+			]
+		});
+		return result.members;
 	}
 }
