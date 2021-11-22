@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { nanoid } from 'nanoid';
+import sequelize from 'sequelize';
 
 import { Class } from './class.entity';
-import { ClassAccount } from '../entities/class-account.entity';
+import { ClassAccount, Role } from '../entities/class-account.entity';
 import { Account } from '../account/account.entity';
 import { createClassDto } from './class.dto/create-class.dto';
 
@@ -43,12 +44,13 @@ export class ClassService {
 		});
 	}
 
-	async CreateAccountClass(AccountId: number, ClassId: number): Promise<void> {
+	async AddMember(AccountId: number, ClassId: number, role: Role): Promise<void> {
 		const classToAdd = {
 			accountId: AccountId,
 			classId: ClassId,
-			role: 'owner'
+			role: role
 		};
+		console.log(classToAdd);
 		await this.classAccountModel.create(classToAdd);
 	}
 
@@ -57,11 +59,68 @@ export class ClassService {
 			const result = await this.classModel.findOne({
 				where: {
 					code: code
-				}
+				},
+				include: [
+					{
+						model: Account,
+						through: {
+							as: 'details',
+							attributes: ['role']
+						},
+						attributes: ['name', 'id']
+					}
+				]
 			});
 			return result;
 		} catch (err) {
 			return null;
 		}
+	}
+
+	async getClassByCodeToEnroll(code: string): Promise<Class> {
+		try {
+			const result = await this.classModel.findOne({
+				where: {
+					code: code
+				},
+				include: [
+					{
+						model: Account,
+						through: {
+							where: {
+								role: 'owner'
+							},
+							attributes: []
+						},
+						attributes: ['name']
+					}
+				]
+			});
+
+			return result;
+		} catch (err) {
+			return null;
+		}
+	}
+
+	async getMemberByRole(id: number, role: string): Promise<Account[]> {
+		const result = await this.classModel.findOne({
+			where: {
+				id: id
+			},
+			include: [
+				{
+					model: Account,
+					attributes: ['id', 'name'],
+					through: {
+						where: {
+							role: role
+						},
+						attributes: []
+					}
+				}
+			]
+		});
+		return result.members;
 	}
 }

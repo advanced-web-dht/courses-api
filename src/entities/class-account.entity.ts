@@ -2,6 +2,8 @@ import { Column, Model, Table, DataType, ForeignKey } from 'sequelize-typescript
 import { Class } from '../class/class.entity';
 import { Account } from '../account/account.entity';
 
+export type Role = 'student' | 'teacher' | 'owner';
+
 @Table
 export class ClassAccount extends Model {
 	@ForeignKey(() => Class)
@@ -13,5 +15,5 @@ export class ClassAccount extends Model {
 	accountId: number;
 
 	@Column({ type: DataType.ENUM('owner', 'student', 'teacher') })
-	role: string;
+	role: Role;
 }

@@ -10,6 +10,7 @@ import { EntityModule } from './entities/entity.module';
 import { ClassModule } from './class/class.module';
 import { AccountModule } from './account/account.module';
 import { AuthModule } from './auth/auth.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
 	imports: [
@@ -21,7 +22,8 @@ import { AuthModule } from './auth/auth.module';
 		EntityModule,
 		ClassModule,
 		AccountModule,
-		AuthModule
+		AuthModule,
+		MailModule
 	],
 	controllers: [AppController],
 	providers: [AppService]

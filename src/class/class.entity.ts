@@ -10,7 +10,7 @@ export class Class extends Model {
 	@Column({ type: DataType.STRING(8), unique: true })
 	code: string;
 
-	@Column({ defaultValue: true })
+	@Column({ defaultValue: false })
 	isDeleted: boolean;
 
 	@Column({ defaultValue: false })
