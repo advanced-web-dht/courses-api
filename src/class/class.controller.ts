@@ -79,6 +79,13 @@ export class ClassController {
 		return this.classService.getMemberByRole(params.classId, params.role);
 	}
 
+	@Get('/:code/enroll')
+	async GetClassToEnroll(@Param('code') code: string): Promise<Class> {
+		const result = await this.classService.getClassByCodeToEnroll(code);
+		return result;
+	}
+
+	@UseGuards(AuthGuard('jwt'))
 	@Get('/:code')
 	async GetClass(@Param('code') code: string): Promise<Class> {
 		const result = await this.classService.getClassByCode(code);

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { nanoid } from 'nanoid';
+import sequelize from 'sequelize';
 
 import { Class } from './class.entity';
 import { ClassAccount, Role } from '../entities/class-account.entity';
@@ -58,13 +59,50 @@ export class ClassService {
 			const result = await this.classModel.findOne({
 				where: {
 					code: code
-				}
+				},
+				include: [
+					{
+						model: Account,
+						through: {
+							as: 'details',
+							attributes: ['role']
+						},
+						attributes: ['name', 'id']
+					}
+				]
 			});
 			return result;
 		} catch (err) {
 			return null;
 		}
 	}
+
+	async getClassByCodeToEnroll(code: string): Promise<Class> {
+		try {
+			const result = await this.classModel.findOne({
+				where: {
+					code: code
+				},
+				include: [
+					{
+						model: Account,
+						through: {
+							where: {
+								role: 'owner'
+							},
+							attributes: []
+						},
+						attributes: ['name']
+					}
+				]
+			});
+
+			return result;
+		} catch (err) {
+			return null;
+		}
+	}
+
 	async getMemberByRole(id: number, role: string): Promise<Account[]> {
 		const result = await this.classModel.findOne({
 			where: {

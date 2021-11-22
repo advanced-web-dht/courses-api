@@ -5,7 +5,6 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 
 import { Account } from './account.entity';
 
-@UseGuards(AuthGuard('jwt'))
 @Controller('accounts')
 export class AccountController {
 	constructor(private readonly accountService: AccountService) {}
@@ -22,6 +21,7 @@ export class AccountController {
 		res.status(200).send({ isExisted: result });
 	}
 
+	@UseGuards(AuthGuard('jwt'))
 	@Post()
 	async updateAccount(@Req() req: FastifyRequest): Promise<Account> {
 		const result = await this.accountService.UpdateAccount(req.body);
