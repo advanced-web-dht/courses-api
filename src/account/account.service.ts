@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
 
 import { Account } from './account.entity';
 import { ClassAccount } from '../entities/class-account.entity';
@@ -14,7 +15,18 @@ export class AccountService {
 	) {}
 
 	async findUser(username: string): Promise<Account> {
-		const account = await this.accountModel.findOne({ where: { username: username } });
+		const account = await this.accountModel.findOne({
+			where: {
+				[Op.or]: [
+					{
+						username: username
+					},
+					{
+						email: username
+					}
+				]
+			}
+		});
 		return account;
 	}
 

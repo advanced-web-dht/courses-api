@@ -1,17 +1,7 @@
-import {
-	Controller,
-	Get,
-	Post,
-	Body,
-	Res,
-	UseGuards,
-	Request,
-	Query,
-	UnauthorizedException,
-	Param
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Res, UseGuards, Request, Req, Param } from '@nestjs/common';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { AuthGuard } from '@nestjs/passport';
+import * as jwt from 'jsonwebtoken';
 
 import { ClassService } from './class.service';
 import { Class } from './class.entity';
@@ -46,12 +36,21 @@ export class ClassController {
 	async InviteStudent(
 		@Res() res: FastifyReply,
 		@Param('code') code: string,
-		@Body('email') email: string
+		@Body('email') email: string,
+		@Body('isTeacher') isTeacher: boolean
 	): Promise<void> {
 		try {
-			const inviteLink = `${process.env.CLIENT_URL}/enroll/${code}`;
-			await this.mailService.sendInvitationMail(email, inviteLink);
-			res.status(200).send({ isSuccess: true });
+			if (isTeacher) {
+				const token = jwt.sign({ email }, process.env.SECRET_KEY, { expiresIn: '10h' });
+				const inviteLink = `${process.env.CLIENT_URL}/enroll/${code}?token=${token}`;
+
+				await this.mailService.sendInvitationMail(email, inviteLink);
+				res.status(200).send({ isSuccess: true });
+			} else {
+				const inviteLink = `${process.env.CLIENT_URL}/enroll/${code}`;
+				await this.mailService.sendInvitationMail(email, inviteLink);
+				res.status(200).send({ isSuccess: true });
+			}
 		} catch (e) {
 			console.log(e);
 			res.status(500).send({ message: 'Internal server error' });
@@ -69,7 +68,37 @@ export class ClassController {
 			await this.classService.AddMember(user.id, classId, 'student');
 			res.status(201).send({ isSuccess: true });
 		} catch (e) {
-			res.status(500).send(e.message);
+			if (e.parent.errno === 1062) {
+				res.status(409).send({ isSuccess: false });
+			} else {
+				res.status(500).send({ isSuccess: false });
+			}
+		}
+	}
+
+	@UseGuards(AuthGuard('jwt'))
+	@Post('/:classId/teachers')
+	async AddTeacher(
+		@Request() { user }: FastifyRequest,
+		@Res() res: FastifyReply,
+		@Body('token') token: string,
+		@Param('classId') classId: number
+	): Promise<void> {
+		const check = jwt.verify(token, process.env.SECRET_KEY);
+		if (check) {
+			try {
+				console.log(user.id, classId);
+				await this.classService.AddMember(user.id, classId, 'teacher');
+				res.status(201).send({ isSuccess: true });
+			} catch (e) {
+				if (e.parent.errno === 1062) {
+					res.status(409).send({ isSuccess: false });
+				} else {
+					res.status(500).send({ isSuccess: false });
+				}
+			}
+		} else {
+			res.status(401).send({ isSuccess: false });
 		}
 	}
 
@@ -87,8 +116,8 @@ export class ClassController {
 
 	@UseGuards(AuthGuard('jwt'))
 	@Get('/:code')
-	async GetClass(@Param('code') code: string): Promise<Class> {
-		const result = await this.classService.getClassByCode(code);
+	async GetClass(@Req() req: FastifyRequest, @Param('code') code: string): Promise<Class> {
+		const result = await this.classService.getClassByCode(code, req.user.id);
 		return result;
 	}
 }
