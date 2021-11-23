@@ -3,6 +3,8 @@ import { Interval } from '@nestjs/schedule';
 import { google } from 'googleapis';
 import { createTransport } from 'nodemailer';
 
+const UPDATE_INTERVAL = 3900 * 1000;
+
 @Injectable()
 export class MailService {
 	private transport;
@@ -12,7 +14,7 @@ export class MailService {
 		})();
 	}
 
-	@Interval(39000)
+	@Interval(UPDATE_INTERVAL)
 	async updateTransport(): Promise<void> {
 		const oAuth2Client = new google.auth.OAuth2(
 			process.env.GG_CLIENT_ID,
