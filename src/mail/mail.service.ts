@@ -44,14 +44,14 @@ export class MailService {
 	async sendInvitationMail(email: string, url: string) {
 		await this.transport.sendMail({
 			to: email,
-			from: '"No Reply" <noreply@example.com>',
-			subject: 'Welcome to Nice App! Confirm your Email',
-			html: `<p>Hello,</p>
-				<p>Please click here to join class</p>
+			from: '"No Reply" <noreply@fitclass.com>',
+			subject: 'Welcome to Fit Class! Lời mời tham gia lớp học',
+			html: `<p>Xin chào,</p>
+				<p>Nhấn vào nút tham gia để ghi danh vào lớp</p>
 				<p>
-				<a href=${url}>Confirm</a> 
+				<a href=${url}>Tham gia</a> 
 				</p>
-				<p>If you did not request this email you can safely ignore it.`
+				<p>Chúc bạn một ngày vui vẻ ('')</p>`
 		});
 	}
 }

@@ -40,7 +40,7 @@ export class AuthController {
 	@UseGuards(AuthGuard('jwt'))
 	@Get('/profile')
 	async getProfile(@Request() req: FastifyRequest): Promise<unknown> {
-		const user = await this.accountService.findUser(req.user.username);
+		const user = await this.accountService.findUser(req.user.email);
 		const { password, ...result } = user;
 		return result;
 	}

@@ -71,7 +71,7 @@ export class ClassService {
 					code: code
 				}
 			});
-			//Check ismember
+			//Check is member
 			const member = result.members.find((member) => member.details.accountId === accountId);
 			if (member) {
 				const owner = result.members.find(
