@@ -1,135 +1,91 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { nanoid } from 'nanoid';
 import { Op } from 'sequelize';
 
-import { Class } from './class.entity';
-import { ClassAccount, Role } from '../entities/class-account.entity';
-import { Account } from '../account/account.entity';
-import { createClassDto } from './class.dto/create-class.dto';
+import { Account } from './account.entity';
+import { ClassAccount } from '../entities/class-account.entity';
 
 @Injectable()
-export class ClassService {
+export class AccountService {
 	constructor(
-		@InjectModel(Class)
-		private classModel: typeof Class,
+		@InjectModel(Account)
+		private accountModel: typeof Account,
 		@InjectModel(ClassAccount)
 		private classAccountModel: typeof ClassAccount
 	) {}
 
-	async CreateClass({ name }: createClassDto): Promise<Class> {
-		const code = nanoid(8);
-		const classToAdd = {
-			name,
-			code
-		};
-		try {
-			const newClass = await this.classModel.create(classToAdd);
-			return newClass;
-		} finally {
-			// do nothing
-		}
-	}
-
-	async getAll(userId: number): Promise<Class[]> {
-		return await this.classModel.findAll({
-			include: [
-				{
-					model: Account,
-					where: {
-						id: userId
-					}
-				}
-			]
-		});
-	}
-
-	async AddMember(AccountId: number, ClassId: number, role: Role): Promise<void> {
-		const classToAdd = {
-			accountId: AccountId,
-			classId: ClassId,
-			role: role
-		};
-		console.log(classToAdd);
-		await this.classAccountModel.create(classToAdd);
-	}
-
-	async getClassByCode(code: string, accountId: number): Promise<Class> {
-		try {
-			const result = await this.classModel.findOne({
-				include: [
+	async findUser(username: string): Promise<Account> {
+		const account = await this.accountModel.findOne({
+			where: {
+				[Op.or]: [
 					{
-						model: Account,
-						through: {
-							as: 'details',
-							attributes: ['role', 'accountId']
-						},
-						attributes: ['name', 'id']
-					}
-				],
-				where: {
-					code: code
-				}
-			});
-			//Check is member
-			const member = result.members.find((member) => member.details.accountId === accountId);
-			if (member) {
-				const owner = result.members.find(
-					(member) => member.id === accountId && member.details.role === 'owner'
-				);
-				result.setDataValue('isOwner', !!owner);
-				return result;
-			}
-			return null;
-		} catch (err) {
-			return null;
-		}
-	}
-
-	async getClassByCodeToEnroll(code: string): Promise<Class> {
-		try {
-			const result = await this.classModel.findOne({
-				where: {
-					code: code
-				},
-				include: [
+						username: username
+					},
 					{
-						model: Account,
-						through: {
-							where: {
-								role: 'owner'
-							},
-							attributes: []
-						},
-						attributes: ['name']
+						email: username
 					}
 				]
-			});
+			}
+		});
+		return account;
+	}
 
-			return result;
-		} catch (err) {
-			return null;
+	async getAccountByEmail(email: string): Promise<Account> {
+		const account = await this.accountModel.findOne({ where: { email: email } });
+		return account;
+	}
+
+	async createAccountGoogle(name: string, email: string): Promise<Account> {
+		const info = {
+			name,
+			email
+		};
+		const newAccount = await this.accountModel.create(info);
+		return newAccount;
+	}
+
+	async createAccount(name: string, email: string, password: string, username: string): Promise<Account> {
+		const info = {
+			name,
+			email,
+			password,
+			username
+		};
+		const newAccount = await this.accountModel.create(info);
+		return newAccount;
+	}
+
+	async checkEmailExisted(email: string): Promise<boolean> {
+		try {
+			const account = await this.accountModel.findOne({ where: { email: email } });
+			if (account) {
+				return true;
+			}
+			return false;
+		} catch (e) {
+			return false;
 		}
 	}
 
-	async getMemberByRole(id: number, role: string): Promise<Account[]> {
-		const result = await this.classModel.findOne({
-			where: {
-				id: id
-			},
-			include: [
-				{
-					model: Account,
-					attributes: ['id', 'name'],
-					through: {
-						where: {
-							role: role
-						},
-						attributes: []
-					}
-				}
-			]
+	async checkUsernameExisted(username: string): Promise<boolean> {
+		try {
+			const account = await this.accountModel.findOne({ where: { username: username } });
+			if (account) {
+				return true;
+			}
+			return false;
+		} catch (e) {
+			return false;
+		}
+	}
+
+	async UpdateAccount(id: number, User: any): Promise<Account> {
+		const user = await this.accountModel.findOne({ where: { id: id } });
+		user.set({
+			name: User.name,
+			studentId: User.studentId
 		});
-		return result.members;
+		await user.save();
+		return user;
 	}
 }
