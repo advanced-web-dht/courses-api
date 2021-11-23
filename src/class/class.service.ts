@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { nanoid } from 'nanoid';
-import sequelize from 'sequelize';
+import { Op } from 'sequelize';
 
 import { Class } from './class.entity';
 import { ClassAccount, Role } from '../entities/class-account.entity';
@@ -54,24 +54,33 @@ export class ClassService {
 		await this.classAccountModel.create(classToAdd);
 	}
 
-	async getClassByCode(code: string): Promise<Class> {
+	async getClassByCode(code: string, accountId: number): Promise<Class> {
 		try {
 			const result = await this.classModel.findOne({
-				where: {
-					code: code
-				},
 				include: [
 					{
 						model: Account,
 						through: {
 							as: 'details',
-							attributes: ['role']
+							attributes: ['role', 'accountId']
 						},
 						attributes: ['name', 'id']
 					}
-				]
+				],
+				where: {
+					code: code
+				}
 			});
-			return result;
+			//Check ismember
+			const member = result.members.find((member) => member.details.accountId === accountId);
+			if (member) {
+				const owner = result.members.find(
+					(member) => member.id === accountId && member.details.role === 'owner'
+				);
+				result.setDataValue('isOwner', !!owner);
+				return result;
+			}
+			return null;
 		} catch (err) {
 			return null;
 		}
