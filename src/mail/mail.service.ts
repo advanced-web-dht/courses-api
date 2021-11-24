@@ -51,7 +51,7 @@ export class MailService {
 				<p>
 				<a href=${url}>Tham gia</a> 
 				</p>
-				<p>Chúc bạn một ngày vui vẻ ('')</p>`
+				<p>Chúc bạn một ngày vui vẻ!!</p>`
 		});
 	}
 }
