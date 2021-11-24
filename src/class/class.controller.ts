@@ -52,7 +52,6 @@ export class ClassController {
 				res.status(200).send({ isSuccess: true });
 			}
 		} catch (e) {
-			console.log(e);
 			res.status(500).send({ message: 'Internal server error' });
 		}
 	}
@@ -87,7 +86,6 @@ export class ClassController {
 		const check = jwt.verify(token, process.env.SECRET_KEY);
 		if (check) {
 			try {
-				console.log(user.id, classId);
 				await this.classService.AddMember(user.id, classId, 'teacher');
 				res.status(201).send({ isSuccess: true });
 			} catch (e) {

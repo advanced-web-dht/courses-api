@@ -50,7 +50,6 @@ export class ClassService {
 			classId: ClassId,
 			role: role
 		};
-		console.log(classToAdd);
 		await this.classAccountModel.create(classToAdd);
 	}
 
