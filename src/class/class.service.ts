@@ -61,7 +61,7 @@ export class ClassService {
 						model: Account,
 						through: {
 							as: 'details',
-							attributes: ['role', 'accountId']
+							attributes: ['role']
 						},
 						attributes: ['name', 'id']
 					}
