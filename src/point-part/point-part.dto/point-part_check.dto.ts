@@ -9,4 +9,7 @@ export class PointPart_checkDto {
 
 	@IsNumber()
 	ratio: number;
+
+	@IsNumber()
+	order: number;
 }

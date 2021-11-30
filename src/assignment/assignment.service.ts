@@ -4,6 +4,7 @@ import { PointPart } from '../point-part/point-part.entity';
 import { Assignment } from './assignment.entity';
 import { PointPart_checkDto } from '../point-part/point-part.dto/point-part_check.dto';
 import { Assignment_checkDto } from './assignment.dto/assignment_check.dto';
+import { Account } from '../account/account.entity';
 
 @Injectable()
 export class AssignmentService {
@@ -26,5 +27,14 @@ export class AssignmentService {
 				id: id
 			}
 		});
+	}
+	async UpdateAssignment({ name, dateEnded, id }): Promise<Assignment> {
+		const line = await this.assignmentModel.findOne({ where: { id: id } });
+		line.set({
+			name,
+			dateEnded
+		});
+		await line.save();
+		return line;
 	}
 }
