@@ -45,7 +45,7 @@ export class AssignmentService {
 					classID: classId
 				}
 			},
-			attributes: ['pointPartId', 'name', 'dateEnded']
+			attributes: ['pointPartId', 'name', 'dateEnded', 'id']
 		});
 		return class_assignment;
 	}

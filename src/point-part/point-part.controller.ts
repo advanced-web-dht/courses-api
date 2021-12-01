@@ -25,14 +25,15 @@ export class PointPartController {
 		}
 	}
 
-	@Get('/:classID')
-	@Roles(Role.owner, Role.teacher)
+	@Get('/:classID') 
 	async GetPointStructure(@Res() res: FastifyReply, @Param('classID') id: string): Promise<void> {
+		console.log(id);
+
 		const result = await this.pointpartService.getPointStructure(id);
 		res.status(200).send({ result });
 	}
 
-	@Put('/pointpart')
+	@Put()
 	@Roles(Role.owner, Role.teacher)
 	async updatePointPart(@Res() res, @Body() req): Promise<void> {
 		try {

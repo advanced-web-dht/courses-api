@@ -25,8 +25,9 @@ export class AssignmentController {
 		}
 	}
 
+	// Need improve
 	@Roles(Role.owner, Role.teacher)
-	@Delete('/:id')
+	@Put('/:id')
 	async DelAssignment(@Res() res: FastifyReply, @Param('id') id: string): Promise<void> {
 		await this.assignmentService.deleteAssignment(id);
 		res.status(200).send({ isSuccess: true });
@@ -48,7 +49,6 @@ export class AssignmentController {
 	}
 
 	@Get('/:classID')
-	@Roles(Role.owner, Role.teacher)
 	async GetPointStructure(@Res() res: FastifyReply, @Param('classID') id: string): Promise<void> {
 		const result = await this.assignmentService.getAllAssignment(id);
 		res.status(200).send({ result });
