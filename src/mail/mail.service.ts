@@ -41,7 +41,7 @@ export class MailService {
 		);
 	}
 
-	async sendInvitationMail(email: string, url: string) {
+	async sendInvitationMail(email: string, url: string): Promise<void> {
 		await this.transport.sendMail({
 			to: email,
 			from: '"No Reply" <noreply@fitclass.com>',

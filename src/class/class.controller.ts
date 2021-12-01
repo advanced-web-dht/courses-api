@@ -21,10 +21,13 @@ export class ClassController {
 
 	@UseGuards(AuthGuard('jwt'))
 	@Post()
-	async AddClass(@Res() res: FastifyReply, @Body() payload: createClassDto, @Request() req): Promise<void> {
+	async AddClass(
+		@Res() res: FastifyReply,
+		@Body() payload: createClassDto,
+		@Request() req: FastifyRequest
+	): Promise<void> {
 		try {
-			const newClass = await this.classService.CreateClass(payload);
-			await this.classService.AddMember(req.user.id, newClass.id, 'owner');
+			const newClass = await this.classService.CreateClass(payload, req.user);
 			res.status(200).send(newClass);
 		} catch (e) {
 			res.status(500).send(e.message);

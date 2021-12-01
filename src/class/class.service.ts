@@ -7,6 +7,7 @@ import { Class } from './class.entity';
 import { ClassAccount, Role } from '../entities/class-account.entity';
 import { Account } from '../account/account.entity';
 import { createClassDto } from './class.dto/create-class.dto';
+import { AccountLogin } from 'src/auth/auth.interface';
 
 @Injectable()
 export class ClassService {
@@ -17,7 +18,7 @@ export class ClassService {
 		private classAccountModel: typeof ClassAccount
 	) {}
 
-	async CreateClass({ name }: createClassDto): Promise<Class> {
+	async CreateClass({ name }: createClassDto, account: AccountLogin): Promise<Class> {
 		const code = nanoid(8);
 		const classToAdd = {
 			name,
@@ -25,6 +26,9 @@ export class ClassService {
 		};
 		try {
 			const newClass = await this.classModel.create(classToAdd);
+			await this.AddMember(account.id, newClass.id, 'owner');
+			newClass.setDataValue('isOwner', true);
+			newClass.setDataValue('members', [{ name: account.name, id: account.id, detail: { role: 'owner' } }]);
 			return newClass;
 		} finally {
 			// do nothing
@@ -36,11 +40,17 @@ export class ClassService {
 			include: [
 				{
 					model: Account,
+					through: {
+						attributes: ['role'],
+						as: 'detail'
+					},
+					attributes: ['name', 'id'],
 					where: {
 						id: userId
 					}
 				}
-			]
+			],
+			attributes: ['id', 'name', 'code']
 		});
 	}
 
@@ -60,8 +70,8 @@ export class ClassService {
 					{
 						model: Account,
 						through: {
-							as: 'details',
-							attributes: ['role', 'accountId']
+							as: 'detail',
+							attributes: ['role']
 						},
 						attributes: ['name', 'id']
 					}
@@ -71,12 +81,9 @@ export class ClassService {
 				}
 			});
 			//Check is member
-			const member = result.members.find((member) => member.details.accountId === accountId);
+			const member = result.members.find((member) => member.id === accountId);
 			if (member) {
-				const owner = result.members.find(
-					(member) => member.id === accountId && member.details.role === 'owner'
-				);
-				result.setDataValue('isOwner', !!owner);
+				result.setDataValue('role', member.detail.role);
 				return result;
 			}
 			return null;

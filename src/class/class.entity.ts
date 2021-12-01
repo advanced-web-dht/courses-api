@@ -20,5 +20,5 @@ export class Class extends Model {
 	visibility: string;
 
 	@BelongsToMany(() => Account, () => ClassAccount)
-	members: Array<Account & { details: ClassAccount }>;
+	members: Array<Account & { detail: ClassAccount }>;
 }
