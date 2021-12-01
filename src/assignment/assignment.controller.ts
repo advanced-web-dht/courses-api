@@ -1,12 +1,12 @@
-import { Body, Controller, Delete, Param, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { AssignmentService } from './assignment.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../role/roles.decorator';
 import { Role } from '../role/role.enum';
 
-@Controller('assignment')
 @UseGuards(AuthGuard('jwt'))
+@Controller('assignment')
 export class AssignmentController {
 	constructor(private readonly assignmentService: AssignmentService) {}
 
@@ -14,7 +14,7 @@ export class AssignmentController {
 	@Roles(Role.owner, Role.teacher)
 	async AddAssignment(@Res() res: FastifyReply, @Body() req, @Req() body: FastifyRequest): Promise<void> {
 		try {
-			const result = await this.assignmentService.addAsignment(req);
+			const result = await this.assignmentService.addAssignment(req);
 			res.status(200).send({ isSuccess: true, assignment: result });
 		} catch (err) {
 			if (err.parent.errno === 1062) {
@@ -45,5 +45,12 @@ export class AssignmentController {
 				res.status(500).send({ isSuccess: false });
 			}
 		}
+	}
+
+	@Get('/:classID')
+	@Roles(Role.owner, Role.teacher)
+	async GetPointStructure(@Res() res: FastifyReply, @Param('classID') id: string): Promise<void> {
+		const result = await this.assignmentService.getAllAssignment(id);
+		res.status(200).send({ result });
 	}
 }

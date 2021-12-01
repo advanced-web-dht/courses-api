@@ -12,7 +12,7 @@ export class AssignmentService {
 		@InjectModel(Assignment)
 		private assignmentModel: typeof Assignment
 	) {}
-	async addAsignment({ name, pointPartId, dateEnded }: Assignment_checkDto): Promise<Assignment> {
+	async addAssignment({ name, pointPartId, dateEnded }: Assignment_checkDto): Promise<Assignment> {
 		const info = {
 			pointPartId,
 			name,
@@ -36,5 +36,17 @@ export class AssignmentService {
 		});
 		await line.save();
 		return line;
+	}
+	async getAllAssignment(classId: string): Promise<Assignment[]> {
+		const class_assignment = await this.assignmentModel.findAll({
+			include: {
+				model: PointPart,
+				where: {
+					classID: classId
+				}
+			},
+			attributes: ['pointPartId', 'name', 'dateEnded']
+		});
+		return class_assignment;
 	}
 }
