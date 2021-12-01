@@ -11,6 +11,9 @@ import { ClassModule } from './class/class.module';
 import { AccountModule } from './account/account.module';
 import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
+import { PointPartModule } from './point-part/point-part.module';
+import { AssignmentModule } from './assignment/assignment.module';
+import { PointModule } from './point/point.module';
 
 @Module({
 	imports: [
@@ -23,7 +26,10 @@ import { MailModule } from './mail/mail.module';
 		ClassModule,
 		AccountModule,
 		AuthModule,
-		MailModule
+		MailModule,
+		PointPartModule,
+		AssignmentModule,
+		PointModule
 	],
 	controllers: [AppController],
 	providers: [AppService]
