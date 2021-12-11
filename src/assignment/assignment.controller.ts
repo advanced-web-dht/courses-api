@@ -51,6 +51,6 @@ export class AssignmentController {
 	@Get('/:classID')
 	async GetPointStructure(@Res() res: FastifyReply, @Param('classID') id: string): Promise<void> {
 		const result = await this.assignmentService.getAllAssignment(id);
-		res.status(200).send({ result });
+		res.status(200).send(result);
 	}
 }

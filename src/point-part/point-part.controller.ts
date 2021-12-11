@@ -4,6 +4,7 @@ import { FastifyReply } from 'fastify';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../role/roles.decorator';
 import { Role } from '../role/role.enum';
+import { PointPart_checkDto } from './point-part.dto/point-part_check.dto';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('pointpart')
@@ -12,9 +13,9 @@ export class PointPartController {
 
 	@Post('/add')
 	@Roles(Role.owner, Role.teacher)
-	async AddPointPart(@Res() res: FastifyReply, @Body() req): Promise<void> {
+	async AddPointPart(@Res() res: FastifyReply, @Body() payload: PointPart_checkDto): Promise<void> {
 		try {
-			const result = await this.pointpartService.addPointPart(req);
+			const result = await this.pointpartService.addPointPart(payload);
 			res.status(201).send({ isSuccess: true, PointPart: result });
 		} catch (err) {
 			if (err.parent.errno === 1062) {
@@ -25,10 +26,8 @@ export class PointPartController {
 		}
 	}
 
-	@Get('/:classID') 
+	@Get('/:classID')
 	async GetPointStructure(@Res() res: FastifyReply, @Param('classID') id: string): Promise<void> {
-		console.log(id);
-
 		const result = await this.pointpartService.getPointStructure(id);
 		res.status(200).send({ result });
 	}

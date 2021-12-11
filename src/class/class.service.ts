@@ -8,6 +8,7 @@ import { ClassAccount, Role } from '../entities/class-account.entity';
 import { Account } from '../account/account.entity';
 import { createClassDto } from './class.dto/create-class.dto';
 import { AccountLogin } from 'src/auth/auth.interface';
+import { PointPart } from '../point-part/point-part.entity';
 
 @Injectable()
 export class ClassService {
@@ -74,8 +75,13 @@ export class ClassService {
 							attributes: ['role']
 						},
 						attributes: ['name', 'id']
+					},
+					{
+						model: PointPart,
+						attributes: { exclude: ['dateCreated', 'dateUpdated'] }
 					}
 				],
+				order: [[{ model: PointPart, as: 'grades' }, 'order', 'ASC']],
 				where: {
 					code: code
 				}

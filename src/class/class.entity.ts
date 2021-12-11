@@ -1,6 +1,7 @@
-import { Column, Model, Table, DataType, BelongsToMany } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, BelongsToMany, HasMany } from 'sequelize-typescript';
 import { Account } from '../account/account.entity';
 import { ClassAccount } from '../entities/class-account.entity';
+import { PointPart } from '../point-part/point-part.entity';
 
 @Table
 export class Class extends Model {
@@ -21,4 +22,7 @@ export class Class extends Model {
 
 	@BelongsToMany(() => Account, () => ClassAccount)
 	members: Array<Account & { detail: ClassAccount }>;
+
+	@HasMany(() => PointPart)
+	grades: PointPart[];
 }
