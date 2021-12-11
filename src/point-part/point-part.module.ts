@@ -6,8 +6,8 @@ import { PointPartService } from './point-part.service';
 import { PointPartController } from './point-part.controller';
 
 @Module({
-	imports: [SequelizeModule.forFeature([PointPart])],
-	controllers: [PointPartController],
-	providers: [PointPartService]
+  imports: [SequelizeModule.forFeature([PointPart])],
+  controllers: [PointPartController],
+  providers: [PointPartService]
 })
 export class PointPartModule {}

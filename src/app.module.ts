@@ -16,22 +16,22 @@ import { AssignmentModule } from './assignment/assignment.module';
 import { PointModule } from './point/point.module';
 
 @Module({
-	imports: [
-		ConfigModule.forRoot({ isGlobal: true, load: [databaseConfigProd, databaseConfigDev] }),
-		SequelizeModule.forRootAsync({
-			imports: [ConfigModule],
-			useFactory: process.env.NODE_ENV === 'development' ? databaseConfigDev : databaseConfigProd
-		}),
-		EntityModule,
-		ClassModule,
-		AccountModule,
-		AuthModule,
-		MailModule,
-		PointPartModule,
-		AssignmentModule,
-		PointModule
-	],
-	controllers: [AppController],
-	providers: [AppService]
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true, load: [databaseConfigProd, databaseConfigDev] }),
+    SequelizeModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: process.env.NODE_ENV === 'development' ? databaseConfigDev : databaseConfigProd
+    }),
+    EntityModule,
+    ClassModule,
+    AccountModule,
+    AuthModule,
+    MailModule,
+    PointPartModule,
+    AssignmentModule,
+    PointModule
+  ],
+  controllers: [AppController],
+  providers: [AppService]
 })
 export class AppModule {}

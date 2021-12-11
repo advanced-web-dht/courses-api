@@ -5,27 +5,27 @@ import { PointPart } from '../point-part/point-part.entity';
 
 @Table
 export class Point extends Model {
-	@ForeignKey(() => Class)
-	@Column({ allowNull: false })
-	classId: number;
+  @ForeignKey(() => Class)
+  @Column({ allowNull: false })
+  classId: number;
 
-	@BelongsTo(() => Class)
-	class: Class;
+  @BelongsTo(() => Class)
+  class: Class;
 
-	@ForeignKey(() => Account)
-	@Column({ allowNull: false })
-	accountId: number;
+  @ForeignKey(() => Account)
+  @Column({ allowNull: false })
+  accountId: number;
 
-	@BelongsTo(() => Account)
-	student: Account;
+  @BelongsTo(() => Account)
+  student: Account;
 
-	@ForeignKey(() => PointPart)
-	@Column({ allowNull: false })
-	pointPartId: number;
+  @ForeignKey(() => PointPart)
+  @Column({ allowNull: false })
+  pointPartId: number;
 
-	@BelongsTo(() => PointPart)
-	pointPart: PointPart;
+  @BelongsTo(() => PointPart)
+  pointPart: PointPart;
 
-	@Column({ allowNull: false })
-	point: number;
+  @Column({ allowNull: false })
+  point: number;
 }

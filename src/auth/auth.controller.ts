@@ -9,39 +9,35 @@ import { SignInGoogleDto } from './auth.dto/sign-in.dto';
 import { MailService } from '../mail/mail.service';
 
 declare module 'fastify' {
-	interface FastifyRequest {
-		user: AccountLogin;
-	}
+  interface FastifyRequest {
+    user: AccountLogin;
+  }
 }
 
 @Controller('auth')
 export class AuthController {
-	constructor(
-		private authService: AuthService,
-		private accountService: AccountService,
-		private emailService: MailService
-	) {}
+  constructor(private authService: AuthService, private accountService: AccountService, private emailService: MailService) {}
 
-	@Post('/register')
-	async register(@Body() req) {
-		return this.authService.registerUser(req);
-	}
-	@Post('/signin/google')
-	async loginGoogle(@Body() payload: SignInGoogleDto) {
-		return this.authService.verifyAccessToken(payload);
-	}
+  @Post('/register')
+  async register(@Body() req) {
+    return this.authService.registerUser(req);
+  }
+  @Post('/signin/google')
+  async loginGoogle(@Body() payload: SignInGoogleDto) {
+    return this.authService.verifyAccessToken(payload);
+  }
 
-	@UseGuards(AuthGuard('local'))
-	@Post('/signin')
-	async login(@Request() req: FastifyRequest) {
-		return this.authService.login(req.user);
-	}
+  @UseGuards(AuthGuard('local'))
+  @Post('/signin')
+  async login(@Request() req: FastifyRequest) {
+    return this.authService.login(req.user);
+  }
 
-	@UseGuards(AuthGuard('jwt'))
-	@Get('/profile')
-	async getProfile(@Request() req: FastifyRequest): Promise<unknown> {
-		const user = await this.accountService.findUser(req.user.email);
-		const { password, ...result } = user;
-		return result;
-	}
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/profile')
+  async getProfile(@Request() req: FastifyRequest): Promise<unknown> {
+    const user = await this.accountService.findUser(req.user.email);
+    const { password, ...result } = user;
+    return result;
+  }
 }

@@ -5,8 +5,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { MailService } from './mail.service';
 
 @Module({
-	imports: [ConfigModule.forRoot(), ScheduleModule.forRoot()],
-	providers: [MailService],
-	exports: [MailService]
+  imports: [ConfigModule.forRoot(), ScheduleModule.forRoot()],
+  providers: [MailService],
+  exports: [MailService]
 })
 export class MailModule {}

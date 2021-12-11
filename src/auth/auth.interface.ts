@@ -1,6 +1,6 @@
 export interface AccountLogin {
-	name: string;
-	username: string;
-	id: number;
-	email?: string;
+  name: string;
+  username: string;
+  id: number;
+  email?: string;
 }

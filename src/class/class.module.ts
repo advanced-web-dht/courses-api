@@ -9,8 +9,8 @@ import { ClassAccount } from '../entities/class-account.entity';
 import { MailModule } from '../mail/mail.module';
 
 @Module({
-	imports: [SequelizeModule.forFeature([Class, ClassAccount]), AuthModule, MailModule],
-	controllers: [ClassController],
-	providers: [ClassService]
+  imports: [SequelizeModule.forFeature([Class, ClassAccount]), AuthModule, MailModule],
+  controllers: [ClassController],
+  providers: [ClassService]
 })
 export class ClassModule {}
