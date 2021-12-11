@@ -2,8 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { PointPart } from './point-part.entity';
 import { PointPart_checkDto } from './point-part.dto/point-part_check.dto';
-import { PointPart_updateDto } from './point-part.dto/point-part_update.dto';
-import sequelize from 'sequelize';
 
 @Injectable()
 export class PointPartService {
@@ -40,16 +38,28 @@ export class PointPartService {
 		await line.save();
 		return line;
 	}
-	async UpdateOrder(order: Record<string, any>): Promise<void> {
-		order.forEach(async (items) => {
-			await this.pointpartModel.update(
-				{ order: items.order as number },
+
+	async UpdateOrder(order: Record<string, number>[]): Promise<void> {
+		// order.forEach(async (items) => {
+		// 	await this.pointpartModel.update(
+		// 		{ order: items.order as number },
+		// 		{
+		// 			where: {
+		// 				id: items.id
+		// 			}
+		// 		}
+		// 	);
+		// });
+		const query = order.map((item) => {
+			this.pointpartModel.update(
+				{ order: item.order as number },
 				{
 					where: {
-						id: items.id
+						id: item.id
 					}
 				}
 			);
 		});
+		await Promise.all(query);
 	}
 }

@@ -1,4 +1,4 @@
-import { Column, Model, Table, DataType, BelongsTo, ForeignKey, HasMany, HasOne } from 'sequelize-typescript';
+import { Column, Model, Table, BelongsTo, ForeignKey } from 'sequelize-typescript';
 import { Class } from '../class/class.entity';
 import { Account } from '../account/account.entity';
 import { PointPart } from '../point-part/point-part.entity';
