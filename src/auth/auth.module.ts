@@ -10,18 +10,18 @@ import { JwtStrategy } from './jwt.strategy';
 import { MailModule } from '../mail/mail.module';
 
 @Module({
-	imports: [
-		ConfigModule.forRoot(),
-		forwardRef(() => AccountModule),
-		PassportModule,
-		JwtModule.register({
-			secret: process.env.SECRET_KEY,
-			signOptions: { expiresIn: process.env.JWT_AGE }
-		}),
-		MailModule
-	],
-	controllers: [AuthController],
-	providers: [AuthService, LocalStrategy, JwtStrategy],
-	exports: [AuthService]
+  imports: [
+    ConfigModule.forRoot(),
+    forwardRef(() => AccountModule),
+    PassportModule,
+    JwtModule.register({
+      secret: process.env.SECRET_KEY,
+      signOptions: { expiresIn: process.env.JWT_AGE }
+    }),
+    MailModule
+  ],
+  controllers: [AuthController],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
+  exports: [AuthService]
 })
 export class AuthModule {}

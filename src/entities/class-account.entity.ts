@@ -6,14 +6,14 @@ export type Role = 'student' | 'teacher' | 'owner';
 
 @Table
 export class ClassAccount extends Model {
-	@ForeignKey(() => Class)
-	@Column({ primaryKey: true })
-	classId: number;
+  @ForeignKey(() => Class)
+  @Column({ primaryKey: true })
+  classId: number;
 
-	@ForeignKey(() => Account)
-	@Column({ primaryKey: true })
-	accountId: number;
+  @ForeignKey(() => Account)
+  @Column({ primaryKey: true })
+  accountId: number;
 
-	@Column({ type: DataType.ENUM('owner', 'student', 'teacher') })
-	role: Role;
+  @Column({ type: DataType.ENUM('owner', 'student', 'teacher') })
+  role: Role;
 }

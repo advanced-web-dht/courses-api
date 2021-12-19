@@ -1,12 +1,12 @@
-import { IsString } from 'class-validator';
+import { IsString, IsDate } from 'class-validator';
 
 export class Assignment_checkDto {
-	@IsString()
-	name: string;
+  @IsString()
+  name: string;
 
-	@IsString()
-	pointPartId: string;
+  @IsString()
+  pointPartId: string;
 
-	@IsString()
-	dateEnded: string;
+  @IsDate()
+  dateEnded: Date;
 }

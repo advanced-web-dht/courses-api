@@ -5,16 +5,16 @@ import { AccountLogin } from './auth.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-	constructor() {
-		super({
-			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-			ignoreExpiration: false,
-			secretOrKey: process.env.SECRET_KEY,
-			session: false
-		});
-	}
+  constructor() {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: process.env.SECRET_KEY,
+      session: false
+    });
+  }
 
-	async validate(payload: AccountLogin): Promise<AccountLogin> {
-		return payload;
-	}
+  async validate(payload: AccountLogin): Promise<AccountLogin> {
+    return payload;
+  }
 }

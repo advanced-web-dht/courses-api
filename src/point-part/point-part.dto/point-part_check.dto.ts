@@ -1,15 +1,15 @@
 import { IsNumber, IsString } from 'class-validator';
 
 export class PointPart_checkDto {
-	@IsString()
-	classId: string;
+  @IsString()
+  classId: string;
 
-	@IsString()
-	name: string;
+  @IsString()
+  name: string;
 
-	@IsNumber()
-	ratio: number;
+  @IsNumber()
+  ratio: number;
 
-	@IsNumber()
-	order: number;
+  @IsNumber()
+  order: number;
 }

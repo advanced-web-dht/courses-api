@@ -8,13 +8,9 @@ import { ClassAccount } from '../entities/class-account.entity';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-	imports: [
-		SequelizeModule.forFeature([Account]),
-		SequelizeModule.forFeature([ClassAccount]),
-		forwardRef(() => AuthModule)
-	],
-	controllers: [AccountController],
-	providers: [AccountService],
-	exports: [AccountService]
+  imports: [SequelizeModule.forFeature([Account]), SequelizeModule.forFeature([ClassAccount]), forwardRef(() => AuthModule)],
+  controllers: [AccountController],
+  providers: [AccountService],
+  exports: [AccountService]
 })
 export class AccountModule {}

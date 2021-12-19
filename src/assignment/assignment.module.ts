@@ -10,14 +10,14 @@ import { RolesGuard } from '../role/roles.guard';
 import { ClassAccount } from '../entities/class-account.entity';
 
 @Module({
-	imports: [SequelizeModule.forFeature([Assignment, ClassAccount]), AuthModule],
-	controllers: [AssignmentController],
-	providers: [
-		AssignmentService,
-		{
-			provide: APP_GUARD,
-			useClass: RolesGuard
-		}
-	]
+  imports: [SequelizeModule.forFeature([Assignment, ClassAccount]), AuthModule],
+  controllers: [AssignmentController],
+  providers: [
+    AssignmentService,
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard
+    }
+  ]
 })
 export class AssignmentModule {}
