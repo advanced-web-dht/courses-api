@@ -5,7 +5,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../role/roles.decorator';
 import { Role } from '../role/role.enum';
 
-@UseGuards(AuthGuard('jwt'))
+// @UseGuards(AuthGuard('jwt'))
 @Controller('pointpart')
 export class PointPartController {
 	constructor(private readonly pointpartService: PointPartService) {}

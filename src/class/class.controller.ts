@@ -75,6 +75,12 @@ export class ClassController {
 		}
 	}
 
+	@Post('/addfromfile')
+	async AddStudentFromFile(@Res() res: FastifyReply, @Body() body, @Request() req): Promise<void> {
+		await this.classService.AddMemberFromFileToAccount(body.member);
+		await this.classService.AddMemberFromFileToClass(body.member, 1);
+	}
+
 	@UseGuards(AuthGuard('jwt'))
 	@Post('/:classId/teachers')
 	async AddTeacher(

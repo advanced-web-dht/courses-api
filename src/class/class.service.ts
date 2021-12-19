@@ -14,7 +14,9 @@ export class ClassService {
 		@InjectModel(Class)
 		private classModel: typeof Class,
 		@InjectModel(ClassAccount)
-		private classAccountModel: typeof ClassAccount
+		private classAccountModel: typeof ClassAccount,
+		@InjectModel(Account)
+		private accountModel: typeof Account
 	) {}
 
 	async CreateClass({ name }: createClassDto): Promise<Class> {
@@ -51,6 +53,31 @@ export class ClassService {
 			role: role
 		};
 		await this.classAccountModel.create(classToAdd);
+	}
+
+	async AddMemberFromFileToClass(member: Record<string, any>, classId: number): Promise<void> {
+		async function getAccountbyStudentId(studentId) {
+			const user = await this.accountModel.findOne({ where: { studentId: studentId } });
+			return user.id;
+		}
+		member.forEach(async (items) => {
+			const classToAdd = {
+				accountId: getAccountbyStudentId(items.studentId),
+				classId: classId,
+				role: 'student'
+			};
+			await this.classAccountModel.create(classToAdd);
+		});
+	}
+
+	async AddMemberFromFileToAccount(member: Record<string, any>): Promise<void> {
+		member.forEach(async (items) => {
+			const classToAdd = {
+				name: items.name,
+				studentId: items.studentId
+			};
+			await this.accountModel.create(classToAdd);
+		});
 	}
 
 	async getClassByCode(code: string, accountId: number): Promise<Class> {
