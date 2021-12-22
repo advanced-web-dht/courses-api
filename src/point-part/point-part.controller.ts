@@ -60,4 +60,14 @@ export class PointPartController {
       }
     }
   }
+  @Get('/:id/:classId')
+  async GetPointPartStudent(@Res() res: FastifyReply, @Param() param): Promise<void> {
+    const result = await this.pointpartService.GetPointPartWithListStudent(param.id, param.classId);
+    res.status(200).send({ result });
+  }
+  @Get('allpoint/:classId')
+  async GetAllPointStudent(@Res() res: FastifyReply, @Param() param): Promise<void> {
+    const result = await this.pointpartService.GetAllWithListStudent(param.classId);
+    res.status(200).send({ result });
+  }
 }

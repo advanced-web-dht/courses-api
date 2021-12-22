@@ -9,17 +9,17 @@ import { Account } from '../account/account.entity';
 import { createClassDto } from './class.dto/create-class.dto';
 import { AccountLogin } from 'src/auth/auth.interface';
 import { PointPart } from '../point-part/point-part.entity';
+import { AccountService } from '../account/account.service';
 
 @Injectable()
 export class ClassService {
-	constructor(
-		@InjectModel(Class)
-		private classModel: typeof Class,
-		@InjectModel(ClassAccount)
-		private classAccountModel: typeof ClassAccount,
-		@InjectModel(Account)
-		private accountModel: typeof Account
-	) {}
+  constructor(
+    @InjectModel(Class)
+    private classModel: typeof Class,
+    @InjectModel(ClassAccount)
+    private classAccountModel: typeof ClassAccount,
+    private readonly accountService: AccountService
+  ) {}
 
   async CreateClass({ name }: createClassDto, account: AccountLogin): Promise<Class> {
     const code = nanoid(8);
@@ -66,32 +66,20 @@ export class ClassService {
     await this.classAccountModel.create(classToAdd);
   }
 
-	async AddMemberFromFileToClass(member: Record<string, any>, classId: number): Promise<void> {
-		async function getAccountbyStudentId(studentId) {
-			const user = await this.accountModel.findOne({ where: { studentId: studentId } });
-			return user.id;
-		}
-		member.forEach(async (items) => {
-			const classToAdd = {
-				accountId: getAccountbyStudentId(items.studentId),
-				classId: classId,
-				role: 'student'
-			};
-			await this.classAccountModel.create(classToAdd);
-		});
-	}
+  async AddMemberFromFileToClass(member: Record<string, any>, classId: number): Promise<void> {
+    member.forEach(async (items) => {
+      console.log(items.studentId);
+      const id = await this.accountService.getAccountbyStudentId(items.studentId);
+      console.log(id);
+      const classToAdd = {
+        accountId: id,
+        classId: classId,
+        role: 'student'
+      };
+      await this.classAccountModel.create(classToAdd);
+    });
+  }
 
-	async AddMemberFromFileToAccount(member: Record<string, any>): Promise<void> {
-		member.forEach(async (items) => {
-			const classToAdd = {
-				name: items.name,
-				studentId: items.studentId
-			};
-			await this.accountModel.create(classToAdd);
-		});
-	}
-
-	
   async getClassByCode(code: string, accountId: number): Promise<Class> {
     try {
       const result = await this.classModel.findOne({
@@ -164,6 +152,26 @@ export class ClassService {
           through: {
             where: {
               role: role
+            },
+            attributes: []
+          }
+        }
+      ]
+    });
+    return result.members;
+  }
+  async getListMemberwithStudentId(id: number): Promise<Account[]> {
+    const result = await this.classModel.findOne({
+      where: {
+        id: id
+      },
+      include: [
+        {
+          model: Account,
+          attributes: ['studentId', 'name'],
+          through: {
+            where: {
+              classId: id
             },
             attributes: []
           }

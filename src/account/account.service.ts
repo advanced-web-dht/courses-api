@@ -79,6 +79,11 @@ export class AccountService {
     }
   }
 
+  async getAccountbyStudentId(studentId: string): Promise<number> {
+    const user = await this.accountModel.findOne({ where: { studentId: studentId } });
+    return user.id;
+  }
+
   async UpdateAccount(id: number, User: any): Promise<Account> {
     const user = await this.accountModel.findOne({ where: { id: id } });
     user.set({
@@ -87,5 +92,14 @@ export class AccountService {
     });
     await user.save();
     return user;
+  }
+  async AddMemberFromFileToAccount(member: Record<string, any>): Promise<void> {
+    member.forEach(async (items) => {
+      const classToAdd = {
+        name: items.name,
+        studentId: items.studentId
+      };
+      await this.accountModel.create(classToAdd);
+    });
   }
 }
