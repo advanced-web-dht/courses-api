@@ -60,14 +60,29 @@ export class PointPartController {
       }
     }
   }
+
   @Get('/:id/:classId')
   async GetPointPartStudent(@Res() res: FastifyReply, @Param() param): Promise<void> {
     const result = await this.pointpartService.GetPointPartWithListStudent(param.id, param.classId);
     res.status(200).send({ result });
   }
+
   @Get('allpoint/:classId')
   async GetAllPointStudent(@Res() res: FastifyReply, @Param() param): Promise<void> {
     const result = await this.pointpartService.GetAllWithListStudent(param.classId);
-    res.status(200).send({ result });
+    res.status(200).send(result);
+  }
+  @Put('/done')
+  async updateStatus(@Res() res, @Body() req): Promise<void> {
+    try {
+      await this.pointpartService.markDone(req.id);
+      res.status(201).send({ isSuccess: true });
+    } catch (err) {
+      if (err.parent.errno === 1062) {
+        res.status(409).send({ isSuccess: false });
+      } else {
+        res.status(500).send({ isSuccess: false });
+      }
+    }
   }
 }

@@ -75,11 +75,11 @@ export class ClassController {
     }
   }
 
-  @Post('/addfromfile')
-  async AddStudentFromFile(@Res() res: FastifyReply, @Body() body, @Request() req): Promise<void> {
+  @Post('/:classId/addfromfile')
+  async AddStudentFromFile(@Res() res: FastifyReply, @Body() body, @Request() req, @Param('classId') classId: number): Promise<void> {
     try {
       this.accountService.AddMemberFromFileToAccount(body).then(() => {
-        this.classService.AddMemberFromFileToClass(body, 1);
+        this.classService.AddMemberFromFileToClass(body, classId);
       });
       res.status(201).send({ isSuccess: true });
     } catch (e) {

@@ -90,7 +90,7 @@ export class ClassService {
               as: 'detail',
               attributes: ['role']
             },
-            attributes: ['name', 'id']
+            attributes: ['name', 'id', 'studentId']
           },
           {
             model: PointPart,
@@ -104,12 +104,14 @@ export class ClassService {
       });
       //Check is member
       const member = result.members.find((member) => member.id === accountId);
+      console.log(member);
       if (member) {
         result.setDataValue('role', member.detail.role);
         return result;
       }
       return null;
     } catch (err) {
+      console.log(err);
       return null;
     }
   }
