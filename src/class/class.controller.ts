@@ -7,10 +7,15 @@ import { ClassService } from './class.service';
 import { Class } from './class.entity';
 import { createClassDto } from './class.dto/create-class.dto';
 import { MailService } from '../mail/mail.service';
+import { AccountService } from '../account/account.service';
 
 @Controller('classes')
 export class ClassController {
-  constructor(private readonly classService: ClassService, private readonly mailService: MailService) {}
+  constructor(
+    private readonly classService: ClassService,
+    private readonly mailService: MailService,
+    private readonly accountService: AccountService
+  ) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
@@ -60,6 +65,22 @@ export class ClassController {
   async AddStudents(@Request() { user }: FastifyRequest, @Res() res: FastifyReply, @Param('classId') classId: number): Promise<void> {
     try {
       await this.classService.AddMember(user.id, classId, 'student');
+      res.status(201).send({ isSuccess: true });
+    } catch (e) {
+      if (e.parent.errno === 1062) {
+        res.status(409).send({ isSuccess: false });
+      } else {
+        res.status(500).send({ isSuccess: false });
+      }
+    }
+  }
+
+  @Post('/:classId/addfromfile')
+  async AddStudentFromFile(@Res() res: FastifyReply, @Body() body, @Request() req, @Param('classId') classId: number): Promise<void> {
+    try {
+      this.accountService.AddMemberFromFileToAccount(body).then(() => {
+        this.classService.AddMemberFromFileToClass(body, classId);
+      });
       res.status(201).send({ isSuccess: true });
     } catch (e) {
       if (e.parent.errno === 1062) {

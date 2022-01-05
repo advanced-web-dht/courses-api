@@ -2,12 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { PointPart } from './point-part.entity';
 import { PointPart_checkDto } from './point-part.dto/point-part_check.dto';
+import { promises } from 'dns';
+import { Account } from '../account/account.entity';
+import { Class } from '../class/class.entity';
+import { Point } from '../point/point.entity';
 
 @Injectable()
 export class PointPartService {
   constructor(
     @InjectModel(PointPart)
-    private pointpartModel: typeof PointPart
+    private pointpartModel: typeof PointPart,
+    @InjectModel(Class)
+    private classModel: typeof Class
   ) {}
   async addPointPart({ classId, name, ratio, order }: PointPart_checkDto): Promise<PointPart> {
     const info = {
@@ -61,5 +67,55 @@ export class PointPartService {
       );
     });
     await Promise.all(query);
+  }
+  async GetPointPartWithListStudent(id: number, classId: number): Promise<Point[]> {
+    const result = await this.pointpartModel.findOne({
+      where: {
+        id: id,
+        classId: classId
+      },
+      include: [
+        {
+          model: Point,
+          include: [
+            {
+              model: Account,
+              attributes: ['studentId']
+            }
+          ],
+          attributes: ['point']
+        }
+      ]
+    });
+    return result.points;
+  }
+  async GetAllWithListStudent(classId: number): Promise<PointPart[]> {
+    const result = await this.pointpartModel.findAll({
+      where: {
+        classId: classId
+      },
+      include: [
+        {
+          model: Point,
+          include: [
+            {
+              model: Account,
+              attributes: ['studentId']
+            }
+          ],
+          attributes: ['point']
+        }
+      ],
+      attributes: ['id', 'name', 'ratio']
+    });
+    return result;
+  }
+  async markDone(id: number): Promise<PointPart> {
+    const line = await this.pointpartModel.findOne({ where: { id: id } });
+    line.set({
+      isDone: 1
+    });
+    await line.save();
+    return line;
   }
 }

@@ -6,7 +6,7 @@ import { Roles } from '../role/roles.decorator';
 import { Role } from '../role/role.enum';
 import { PointPart_checkDto } from './point-part.dto/point-part_check.dto';
 
-@UseGuards(AuthGuard('jwt'))
+// @UseGuards(AuthGuard('jwt'))
 @Controller('pointpart')
 export class PointPartController {
   constructor(private readonly pointpartService: PointPartService) {}
@@ -51,6 +51,31 @@ export class PointPartController {
   async updateOrder(@Res() res, @Body() req): Promise<void> {
     try {
       await this.pointpartService.UpdateOrder(req.order);
+      res.status(201).send({ isSuccess: true });
+    } catch (err) {
+      if (err.parent.errno === 1062) {
+        res.status(409).send({ isSuccess: false });
+      } else {
+        res.status(500).send({ isSuccess: false });
+      }
+    }
+  }
+
+  @Get('/:id/:classId')
+  async GetPointPartStudent(@Res() res: FastifyReply, @Param() param): Promise<void> {
+    const result = await this.pointpartService.GetPointPartWithListStudent(param.id, param.classId);
+    res.status(200).send({ result });
+  }
+
+  @Get('allpoint/:classId')
+  async GetAllPointStudent(@Res() res: FastifyReply, @Param() param): Promise<void> {
+    const result = await this.pointpartService.GetAllWithListStudent(param.classId);
+    res.status(200).send(result);
+  }
+  @Put('/done')
+  async updateStatus(@Res() res, @Body() req): Promise<void> {
+    try {
+      await this.pointpartService.markDone(req.id);
       res.status(201).send({ isSuccess: true });
     } catch (err) {
       if (err.parent.errno === 1062) {

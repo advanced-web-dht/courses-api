@@ -24,6 +24,9 @@ export class PointPart extends Model {
   @Column({ allowNull: true })
   order: number;
 
+  @Column({ allowNull: true })
+  isDone: number;
+
   @HasOne(() => Assignment)
   assignment: Assignment;
 
