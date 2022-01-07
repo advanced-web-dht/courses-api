@@ -4,6 +4,7 @@ import { Op } from 'sequelize';
 
 import { Account } from './account.entity';
 import { ClassAccount } from '../entities/class-account.entity';
+import { UpdateAccountDto } from './account.dto/update-account.dto';
 
 @Injectable()
 export class AccountService {
@@ -79,12 +80,12 @@ export class AccountService {
     }
   }
 
-  async getAccountbyStudentId(studentId: string): Promise<number> {
+  async getAccountByStudentId(studentId: string): Promise<number> {
     const user = await this.accountModel.findOne({ where: { studentId: studentId } });
     return user.id;
   }
 
-  async UpdateAccount(id: number, User: any): Promise<Account> {
+  async UpdateAccount(id: number, User: UpdateAccountDto): Promise<Account> {
     const user = await this.accountModel.findOne({ where: { id: id } });
     user.set({
       name: User.name,

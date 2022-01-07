@@ -7,7 +7,6 @@ import { ClassController } from './class.controller';
 import { AuthModule } from '../auth/auth.module';
 import { ClassAccount } from '../entities/class-account.entity';
 import { MailModule } from '../mail/mail.module';
-import { Account } from '../account/account.entity';
 import { AccountModule } from '../account/account.module';
 
 @Module({

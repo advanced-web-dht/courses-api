@@ -2,9 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { PointPart } from '../point-part/point-part.entity';
 import { Assignment } from './assignment.entity';
-import { PointPart_checkDto } from '../point-part/point-part.dto/point-part_check.dto';
-import { Assignment_checkDto } from './assignment.dto/assignment_check.dto';
-import { Account } from '../account/account.entity';
+import { AddAssignmentDto } from './assignment.dto/add-assignment.dto';
+import { UpdateAssignmentDto } from './assignment.dto/update-assignment.dto';
 
 @Injectable()
 export class AssignmentService {
@@ -12,7 +11,7 @@ export class AssignmentService {
     @InjectModel(Assignment)
     private assignmentModel: typeof Assignment
   ) {}
-  async addAssignment({ name, pointPartId, dateEnded }: Assignment_checkDto): Promise<Assignment> {
+  async addAssignment({ name, pointPartId, dateEnded }: AddAssignmentDto): Promise<Assignment> {
     const info = {
       pointPartId,
       name,
@@ -28,7 +27,7 @@ export class AssignmentService {
       }
     });
   }
-  async UpdateAssignment({ name, dateEnded, id }): Promise<Assignment> {
+  async UpdateAssignment({ name, dateEnded, id }: UpdateAssignmentDto): Promise<Assignment> {
     const line = await this.assignmentModel.findOne({ where: { id: id } });
     line.set({
       name,

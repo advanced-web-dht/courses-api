@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { nanoid } from 'nanoid';
-import { Op } from 'sequelize';
 
 import { Class } from './class.entity';
 import { ClassAccount, Role } from '../entities/class-account.entity';
@@ -9,7 +8,6 @@ import { Account } from '../account/account.entity';
 import { createClassDto } from './class.dto/create-class.dto';
 import { AccountLogin } from 'src/auth/auth.interface';
 import { PointPart } from '../point-part/point-part.entity';
-import { AccountService } from '../account/account.service';
 
 @Injectable()
 export class ClassService {
@@ -17,8 +15,7 @@ export class ClassService {
     @InjectModel(Class)
     private classModel: typeof Class,
     @InjectModel(ClassAccount)
-    private classAccountModel: typeof ClassAccount,
-    private readonly accountService: AccountService
+    private classAccountModel: typeof ClassAccount
   ) {}
 
   async CreateClass({ name }: createClassDto, account: AccountLogin): Promise<Class> {
@@ -66,18 +63,8 @@ export class ClassService {
     await this.classAccountModel.create(classToAdd);
   }
 
-  async AddMemberFromFileToClass(member: Record<string, any>, classId: number): Promise<void> {
-    member.forEach(async (items) => {
-      console.log(items.studentId);
-      const id = await this.accountService.getAccountbyStudentId(items.studentId);
-      console.log(id);
-      const classToAdd = {
-        accountId: id,
-        classId: classId,
-        role: 'student'
-      };
-      await this.classAccountModel.create(classToAdd);
-    });
+  async AddStudentList(students: Record<string, string>[], classId: number): Promise<void> {
+    this.classModel.update({ studentList: students }, { where: { id: classId } });
   }
 
   async getClassByCode(code: string, accountId: number): Promise<Class> {
@@ -104,7 +91,6 @@ export class ClassService {
       });
       //Check is member
       const member = result.members.find((member) => member.id === accountId);
-      console.log(member);
       if (member) {
         result.setDataValue('role', member.detail.role);
         return result;
@@ -162,7 +148,7 @@ export class ClassService {
     });
     return result.members;
   }
-  async getListMemberwithStudentId(id: number): Promise<Account[]> {
+  async GetListMemberWithStudentId(id: number): Promise<Account[]> {
     const result = await this.classModel.findOne({
       where: {
         id: id

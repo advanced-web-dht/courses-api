@@ -15,7 +15,7 @@ export class PointService {
   ) {}
   async addPointFromFile({ point, classId, pointpartId }: Point_checkDto): Promise<void> {
     point.forEach(async (items) => {
-      const id = await this.accountService.getAccountbyStudentId(items.studentId);
+      const id = await this.accountService.getAccountByStudentId(items.studentId);
       const info = {
         classId: classId,
         accountId: id,
@@ -26,7 +26,7 @@ export class PointService {
     });
   }
   async addPoint({ point, classId, pointpartId, studentId }): Promise<void> {
-    const id = await this.accountService.getAccountbyStudentId(studentId);
+    const id = await this.accountService.getAccountByStudentId(studentId);
     const info = {
       classId: classId,
       accountId: id,

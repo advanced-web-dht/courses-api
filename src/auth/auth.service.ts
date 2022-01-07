@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { AccountService } from '../account/account.service';
 import { AccountLogin } from './auth.interface';
 import { SignInGoogleDto } from './auth.dto/sign-in.dto';
+import { SignUpDto } from './auth.dto/sign-up.dto';
 
 @Injectable()
 export class AuthService {
@@ -62,15 +63,15 @@ export class AuthService {
       throw new UnauthorizedException();
     }
   }
-  async registerUser(userInfo): Promise<unknown> {
+  async registerUser(userInfo: SignUpDto): Promise<boolean> {
     const saltOrRounds = 10;
     const hash = await bcrypt.hash(userInfo.password, saltOrRounds);
-    console.log(userInfo.username);
+
     try {
-      const newUser = await this.accountService.createAccount(userInfo.name, userInfo.email, hash, userInfo.username);
-      return { isSuccess: true };
+      await this.accountService.createAccount(userInfo.name, userInfo.email, hash, userInfo.username);
+      return true;
     } catch (e) {
-      throw new UnauthorizedException();
+      return false;
     }
   }
 }

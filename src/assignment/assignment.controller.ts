@@ -1,9 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { Body, Controller, Get, Param, Post, Put, Res, UseGuards } from '@nestjs/common';
+import { FastifyReply } from 'fastify';
 import { AssignmentService } from './assignment.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../role/roles.decorator';
 import { Role } from '../role/role.enum';
+import { UpdateAssignmentDto } from './assignment.dto/update-assignment.dto';
+import { AddAssignmentDto } from './assignment.dto/add-assignment.dto';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('assignment')
@@ -12,7 +14,7 @@ export class AssignmentController {
 
   @Post('/add')
   @Roles(Role.owner, Role.teacher)
-  async AddAssignment(@Res() res: FastifyReply, @Body() req, @Req() body: FastifyRequest): Promise<void> {
+  async AddAssignment(@Res() res: FastifyReply, @Body() req: AddAssignmentDto): Promise<void> {
     try {
       const result = await this.assignmentService.addAssignment(req);
       res.status(200).send({ isSuccess: true, assignment: result });
@@ -35,9 +37,9 @@ export class AssignmentController {
 
   @Roles(Role.owner, Role.teacher)
   @Put()
-  async updateAssignment(@Res() res, @Body() req): Promise<void> {
+  async updateAssignment(@Res() res: FastifyReply, @Body() body: UpdateAssignmentDto): Promise<void> {
     try {
-      await this.assignmentService.UpdateAssignment(req);
+      await this.assignmentService.UpdateAssignment(body);
       res.status(201).send({ isSuccess: true });
     } catch (err) {
       if (err.parent.errno === 1062) {

@@ -2,7 +2,7 @@ import { IsNumber, IsString } from 'class-validator';
 
 export class PointPart_checkDto {
   @IsNumber()
-  classId: string;
+  classId: number;
 
   @IsString()
   name: string;

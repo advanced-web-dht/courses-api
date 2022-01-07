@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
 
 import { PointService } from './point.service';

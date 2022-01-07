@@ -8,6 +8,7 @@ import { Class } from './class.entity';
 import { createClassDto } from './class.dto/create-class.dto';
 import { MailService } from '../mail/mail.service';
 import { AccountService } from '../account/account.service';
+import { Account } from '../account/account.entity';
 
 @Controller('classes')
 export class ClassController {
@@ -75,19 +76,18 @@ export class ClassController {
     }
   }
 
-  @Post('/:classId/addfromfile')
-  async AddStudentFromFile(@Res() res: FastifyReply, @Body() body, @Request() req, @Param('classId') classId: number): Promise<void> {
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/:classId/list')
+  async AddStudentFromList(
+    @Res() res: FastifyReply,
+    @Body() body: Record<string, string>[],
+    @Param('classId') classId: number
+  ): Promise<void> {
     try {
-      this.accountService.AddMemberFromFileToAccount(body).then(() => {
-        this.classService.AddMemberFromFileToClass(body, classId);
-      });
+      this.classService.AddStudentList(body, classId);
       res.status(201).send({ isSuccess: true });
     } catch (e) {
-      if (e.parent.errno === 1062) {
-        res.status(409).send({ isSuccess: false });
-      } else {
-        res.status(500).send({ isSuccess: false });
-      }
+      res.status(500).send({ isSuccess: false });
     }
   }
 
@@ -118,7 +118,7 @@ export class ClassController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('/:classId/:role')
-  async register(@Param() params) {
+  async register(@Param() params: { classId: number; role: string }): Promise<Account[]> {
     return this.classService.getMemberByRole(params.classId, params.role);
   }
 
