@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Request, UseGuards, Body } from '@nestjs/common';
-import { FastifyRequest } from 'fastify';
+import { Controller, Get, Post, Request, UseGuards, Body, Res } from '@nestjs/common';
+import { FastifyRequest, FastifyReply } from 'fastify';
 import { AuthGuard } from '@nestjs/passport';
 
 import { AuthService } from './auth.service';
@@ -19,8 +19,17 @@ export class AuthController {
   constructor(private authService: AuthService, private accountService: AccountService) {}
 
   @Post('/register')
-  async register(@Body() body: SignUpDto): Promise<boolean> {
-    return this.authService.registerUser(body);
+  async register(@Body() body: SignUpDto, @Res() res: FastifyReply): Promise<void> {
+    try {
+      const result = await this.authService.registerUser(body);
+      if (result) {
+        res.status(201).send({ isSuccess: result });
+      } else {
+        res.status(400).send({ isSuccess: result });
+      }
+    } catch (err) {
+      res.status(500).send({ isSuccess: false });
+    }
   }
   @Post('/signin/google')
   async loginGoogle(@Body() payload: SignInGoogleDto): Promise<Record<string, string>> {

@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 
 import { Account } from './account.entity';
-import { ClassAccount } from '../entities/class-account.entity';
+import { ClassTeacher } from '../entities/class-teacher.entity';
 import { UpdateAccountDto } from './account.dto/update-account.dto';
 
 @Injectable()
@@ -11,8 +11,8 @@ export class AccountService {
   constructor(
     @InjectModel(Account)
     private accountModel: typeof Account,
-    @InjectModel(ClassAccount)
-    private classAccountModel: typeof ClassAccount
+    @InjectModel(ClassTeacher)
+    private classAccountModel: typeof ClassTeacher
   ) {}
 
   async findUser(username: string): Promise<Account> {

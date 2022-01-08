@@ -4,6 +4,6 @@ export class UpdateAccountDto {
   @IsString()
   name: string;
 
-  @IsNumber()
+  @IsString()
   studentId: string;
 }

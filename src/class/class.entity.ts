@@ -1,7 +1,8 @@
-import { Column, Model, Table, DataType, BelongsToMany, HasMany } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, BelongsToMany, HasMany, BelongsTo } from 'sequelize-typescript';
 import { Account } from '../account/account.entity';
-import { ClassAccount } from '../entities/class-account.entity';
+import { ClassTeacher } from '../entities/class-teacher.entity';
 import { PointPart } from '../point-part/point-part.entity';
+import { ClassStudent } from '../entities/class-student.entity';
 
 @Table
 export class Class extends Model {
@@ -20,9 +21,17 @@ export class Class extends Model {
   @Column({ type: DataType.ENUM('public', 'private'), defaultValue: 'public' })
   visibility: string;
 
-  @BelongsToMany(() => Account, () => ClassAccount)
-  members: Array<Account & { detail: ClassAccount }>;
+  @BelongsToMany(() => Account, () => ClassTeacher)
+  teachers: Array<Account & { detail: ClassTeacher }>;
+
+  @HasMany(() => ClassStudent)
+  students: Array<ClassStudent>;
 
   @HasMany(() => PointPart)
   grades: PointPart[];
+
+  @BelongsTo(() => Account, 'ownerId')
+  owner: Account;
+
+  role: string;
 }

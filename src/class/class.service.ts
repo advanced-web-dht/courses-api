@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { nanoid } from 'nanoid';
+import { Op } from 'sequelize';
 
 import { Class } from './class.entity';
-import { ClassAccount, Role } from '../entities/class-account.entity';
+import { ClassTeacher, Role } from '../entities/class-teacher.entity';
+import { ClassStudent } from '../entities/class-student.entity';
 import { Account } from '../account/account.entity';
 import { createClassDto } from './class.dto/create-class.dto';
 import { AccountLogin } from 'src/auth/auth.interface';
@@ -14,21 +16,22 @@ export class ClassService {
   constructor(
     @InjectModel(Class)
     private classModel: typeof Class,
-    @InjectModel(ClassAccount)
-    private classAccountModel: typeof ClassAccount
+    @InjectModel(ClassTeacher)
+    private classTeacher: typeof ClassTeacher,
+    @InjectModel(ClassStudent)
+    private classStudent: typeof ClassStudent
   ) {}
 
   async CreateClass({ name }: createClassDto, account: AccountLogin): Promise<Class> {
     const code = nanoid(8);
     const classToAdd = {
       name,
-      code
+      code,
+      ownerId: account.id
     };
     try {
       const newClass = await this.classModel.create(classToAdd);
-      await this.AddMember(account.id, newClass.id, 'owner');
-      newClass.setDataValue('isOwner', true);
-      newClass.setDataValue('members', [{ name: account.name, id: account.id, detail: { role: 'owner' } }]);
+      newClass.setDataValue('owner', { ownerId: account.id });
       return newClass;
     } finally {
       // do nothing
@@ -36,22 +39,45 @@ export class ClassService {
   }
 
   async getAll(userId: number): Promise<Class[]> {
-    return await this.classModel.findAll({
+    const raw = await this.classModel.findAll({
       include: [
         {
           model: Account,
-          through: {
-            attributes: ['role'],
-            as: 'detail'
-          },
-          attributes: ['name', 'id'],
-          where: {
-            id: userId
-          }
+          as: 'teachers'
+        },
+        {
+          model: Account,
+          as: 'owner'
+        },
+        {
+          model: ClassStudent,
+          include: [
+            {
+              model: Account
+            }
+          ]
         }
       ],
-      attributes: ['id', 'name', 'code']
+      attributes: ['id', 'name', 'code'],
+      where: {
+        [Op.or]: [
+          { '$students.accountId$': userId },
+          {
+            '$teachers.id$': userId
+          },
+          {
+            ownerId: userId
+          }
+        ]
+      }
     });
+
+    // Check role
+    const result = raw.map((cls) => {
+      this.setRoleForResult(cls, userId);
+      return cls;
+    });
+    return result;
   }
 
   async AddMember(AccountId: number, ClassId: number, role: Role): Promise<void> {
@@ -60,11 +86,38 @@ export class ClassService {
       classId: ClassId,
       role: role
     };
-    await this.classAccountModel.create(classToAdd);
+    await this.classTeacher.create(classToAdd);
   }
 
-  async AddStudentList(students: Record<string, string>[], classId: number): Promise<void> {
-    this.classModel.update({ studentList: students }, { where: { id: classId } });
+  async AddStudent(accountId: number, classId: number, studentId: string, name: string): Promise<void> {
+    const student = await this.classStudent.findOne({ where: { studentId, classId } });
+    if (!student) {
+      await this.classStudent.create({ accountId, classId, studentId, name });
+      return;
+    }
+    if (student.accountId) {
+      return;
+    } else {
+      // Map account
+      student.set('accountId', accountId);
+      await student.save();
+    }
+  }
+
+  async AddTeacher(AccountId: number, ClassId: number): Promise<void> {
+    const classToAdd = {
+      accountId: AccountId,
+      classId: ClassId
+    };
+    await this.classTeacher.create(classToAdd);
+  }
+
+  async AddStudentList(students: Record<string, string | number>[], classId: number): Promise<void> {
+    const studentsToAdd = students.map((student) => {
+      student.classId = classId;
+      return student;
+    });
+    this.classStudent.bulkCreate(studentsToAdd, { updateOnDuplicate: ['name'] });
   }
 
   async getClassByCode(code: string, accountId: number): Promise<Class> {
@@ -73,11 +126,21 @@ export class ClassService {
         include: [
           {
             model: Account,
-            through: {
-              as: 'detail',
-              attributes: ['role']
-            },
+            as: 'teachers',
             attributes: ['name', 'id', 'studentId']
+          },
+          {
+            model: Account,
+            as: 'owner',
+            attributes: ['name', 'id']
+          },
+          {
+            model: ClassStudent,
+            include: [
+              {
+                model: Account
+              }
+            ]
           },
           {
             model: PointPart,
@@ -90,9 +153,57 @@ export class ClassService {
         }
       });
       //Check is member
-      const member = result.members.find((member) => member.id === accountId);
-      if (member) {
-        result.setDataValue('role', member.detail.role);
+      const teacher = result.teachers.find((member) => member.id === accountId);
+      const student = result.students.find((member) => member.accountId === accountId);
+      if (teacher || student || result.owner.id === accountId) {
+        this.setRoleForResult(result, accountId);
+        return result;
+      }
+      return null;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  }
+
+  async getClassById(classId: number, accountId: number): Promise<Class> {
+    try {
+      const result = await this.classModel.findOne({
+        include: [
+          {
+            model: Account,
+            as: 'teachers',
+            attributes: ['name', 'id', 'studentId']
+          },
+          {
+            model: Account,
+            as: 'owner',
+            attributes: ['name', 'id']
+          },
+          {
+            model: ClassStudent
+          },
+          {
+            model: PointPart,
+            attributes: { exclude: ['dateCreated', 'dateUpdated'] }
+          }
+        ],
+        order: [[{ model: PointPart, as: 'grades' }, 'order', 'ASC']],
+        where: {
+          id: classId,
+          [Op.or]: [
+            { '$students.accountId$': accountId },
+            {
+              '$teachers.id$': accountId
+            },
+            {
+              ownerId: accountId
+            }
+          ]
+        }
+      });
+      if (result) {
+        this.setRoleForResult(result, accountId);
         return result;
       }
       return null;
@@ -111,12 +222,7 @@ export class ClassService {
         include: [
           {
             model: Account,
-            through: {
-              where: {
-                role: 'owner'
-              },
-              attributes: []
-            },
+            as: 'owner',
             attributes: ['name']
           }
         ]
@@ -146,7 +252,7 @@ export class ClassService {
         }
       ]
     });
-    return result.members;
+    return result.teachers;
   }
   async GetListMemberWithStudentId(id: number): Promise<Account[]> {
     const result = await this.classModel.findOne({
@@ -166,6 +272,27 @@ export class ClassService {
         }
       ]
     });
-    return result.members;
+    return result.teachers;
+  }
+
+  setRoleForResult(cls: Class, userId: number): void {
+    if (cls.owner?.id === userId) {
+      cls.setDataValue('role', 'owner');
+    }
+
+    const teacherIndex = cls.teachers.findIndex((teacher) => teacher.id === userId);
+    if (teacherIndex != -1) {
+      cls.setDataValue('role', 'teacher');
+    }
+
+    const studentIndex = cls.students.findIndex((student) => student.accountId === userId);
+    if (studentIndex != -1) {
+      cls.setDataValue('role', 'student');
+    }
+  }
+
+  async GetRole(accountId: number, classId: number): Promise<string> {
+    const cls = await this.getClassById(classId, accountId);
+    return cls.getDataValue('role');
   }
 }

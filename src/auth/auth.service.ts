@@ -18,7 +18,7 @@ export class AuthService {
       return null;
     }
     if (user && bcrypt.compare(user.password, password)) {
-      return { name: user.name, username: user.username, id: user.id };
+      return { name: user.name, username: user.username, id: user.id, studentId: user.studentId };
     }
     return null;
   }
@@ -43,7 +43,8 @@ export class AuthService {
             accessToken: this.jwtService.sign({
               name: user.name,
               email: user.email,
-              id: user.id
+              id: user.id,
+              studentId: user.studentId
             })
           };
         } else {

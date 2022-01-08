@@ -63,9 +63,14 @@ export class ClassController {
 
   @UseGuards(AuthGuard('jwt'))
   @Post('/:classId/students')
-  async AddStudents(@Request() { user }: FastifyRequest, @Res() res: FastifyReply, @Param('classId') classId: number): Promise<void> {
+  async AddStudents(
+    @Request() { user }: FastifyRequest,
+    @Res() res: FastifyReply,
+    @Param('classId') classId: number,
+    @Body('studentId') studentId: string
+  ): Promise<void> {
     try {
-      await this.classService.AddMember(user.id, classId, 'student');
+      await this.classService.AddStudent(user.id, classId, studentId, user.name);
       res.status(201).send({ isSuccess: true });
     } catch (e) {
       if (e.parent.errno === 1062) {
@@ -80,7 +85,7 @@ export class ClassController {
   @Post('/:classId/list')
   async AddStudentFromList(
     @Res() res: FastifyReply,
-    @Body() body: Record<string, string>[],
+    @Body() body: Record<string, string | number>[],
     @Param('classId') classId: number
   ): Promise<void> {
     try {
@@ -102,7 +107,7 @@ export class ClassController {
     const check = jwt.verify(token, process.env.SECRET_KEY);
     if (check) {
       try {
-        await this.classService.AddMember(user.id, classId, 'teacher');
+        await this.classService.AddTeacher(user.id, classId);
         res.status(201).send({ isSuccess: true });
       } catch (e) {
         if (e.parent.errno === 1062) {

@@ -14,6 +14,7 @@ import { MailModule } from './mail/mail.module';
 import { PointPartModule } from './point-part/point-part.module';
 import { AssignmentModule } from './assignment/assignment.module';
 import { PointModule } from './point/point.module';
+import { RoleModule } from './role/role.module';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { PointModule } from './point/point.module';
     MailModule,
     PointPartModule,
     AssignmentModule,
-    PointModule
+    PointModule,
+    RoleModule
   ],
   controllers: [AppController],
   providers: [AppService]

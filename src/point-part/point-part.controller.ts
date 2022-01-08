@@ -72,6 +72,7 @@ export class PointPartController {
     const result = await this.pointpartService.GetAllWithListStudent(param.classId);
     res.status(200).send(result);
   }
+
   @Put('/done')
   async updateStatus(@Res() res, @Body() req): Promise<void> {
     try {
@@ -83,6 +84,16 @@ export class PointPartController {
       } else {
         res.status(500).send({ isSuccess: false });
       }
+    }
+  }
+
+  @Get('/:gradeId/points')
+  async GetPointOfPointPart(@Res() res: FastifyReply, @Param('gradeId') gradeId): Promise<void> {
+    try {
+      const result = await this.pointpartService.GetAllPoint(gradeId);
+      res.status(200).send(result.points);
+    } catch {
+      res.status(500).send({ isSuccess: false, message: 'Internal server error' });
     }
   }
 }

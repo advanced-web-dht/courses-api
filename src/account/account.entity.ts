@@ -1,7 +1,8 @@
-import { Column, Model, Table, DataType, BelongsToMany } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, BelongsToMany, HasMany } from 'sequelize-typescript';
 
 import { Class } from '../class/class.entity';
-import { ClassAccount } from '../entities/class-account.entity';
+import { ClassTeacher } from '../entities/class-teacher.entity';
+import { ClassStudent } from '../entities/class-student.entity';
 
 @Table
 export class Account extends Model {
@@ -23,6 +24,12 @@ export class Account extends Model {
   @Column({ type: DataType.ENUM('active', 'inactive', 'blocked', 'deleted'), defaultValue: 'active' })
   status: string;
 
-  @BelongsToMany(() => Class, () => ClassAccount)
-  classes: Array<Class & { ClassAccount: ClassAccount }>;
+  @BelongsToMany(() => Class, () => ClassTeacher, 'accountId')
+  tClasses: Array<Class & { ClassAccount: ClassTeacher }>;
+
+  @HasMany(() => ClassStudent)
+  sClasses: Array<ClassStudent>;
+
+  @HasMany(() => Class, 'ownerId')
+  oClasses: Array<Class>;
 }

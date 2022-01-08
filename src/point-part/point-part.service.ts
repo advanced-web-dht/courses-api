@@ -89,6 +89,7 @@ export class PointPartService {
     });
     return result.points;
   }
+
   async GetAllWithListStudent(classId: number): Promise<PointPart[]> {
     const result = await this.pointpartModel.findAll({
       where: {
@@ -117,5 +118,20 @@ export class PointPartService {
     });
     await line.save();
     return line;
+  }
+
+  async GetAllPoint(gradeId: number): Promise<PointPart> {
+    const result = await this.pointpartModel.findOne({
+      where: {
+        id: gradeId
+      },
+      include: [
+        {
+          model: Point,
+          attributes: ['studentId', 'point']
+        }
+      ]
+    });
+    return result;
   }
 }
