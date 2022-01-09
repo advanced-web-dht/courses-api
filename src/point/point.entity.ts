@@ -1,30 +1,22 @@
-import { Column, Model, Table, BelongsTo, ForeignKey, DataType } from 'sequelize-typescript';
+import { Column, Model, Table, BelongsTo, ForeignKey, DataType, PrimaryKey } from 'sequelize-typescript';
 import { Class } from '../class/class.entity';
 import { PointPart } from '../point-part/point-part.entity';
 import { ClassStudent } from '../entities/class-student.entity';
+import { Op } from 'sequelize';
 
 @Table
 export class Point extends Model {
-  @ForeignKey(() => Class)
-  @Column({ allowNull: false, primaryKey: true })
-  classId: number;
-
-  @BelongsTo(() => Class)
-  class: Class;
-
   @ForeignKey(() => ClassStudent)
   @Column({ allowNull: false, type: DataType.STRING(15), primaryKey: true })
   studentId: string;
 
-  @BelongsTo(() => ClassStudent, 'studentId')
-  student: ClassStudent;
-
-  @ForeignKey(() => PointPart)
   @Column({ allowNull: false, primaryKey: true })
-  pointPartId: number;
+  classId: number;
 
-  @BelongsTo(() => PointPart)
-  pointPart: PointPart;
+  @PrimaryKey
+  @ForeignKey(() => PointPart)
+  @Column({ allowNull: false })
+  pointPartId: number;
 
   @Column({ allowNull: false })
   point: number;

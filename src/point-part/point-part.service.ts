@@ -6,6 +6,7 @@ import { promises } from 'dns';
 import { Account } from '../account/account.entity';
 import { Class } from '../class/class.entity';
 import { Point } from '../point/point.entity';
+import { ClassStudent } from '../entities/class-student.entity';
 
 @Injectable()
 export class PointPartService {
@@ -68,27 +69,27 @@ export class PointPartService {
     });
     await Promise.all(query);
   }
-  async GetPointPartWithListStudent(id: number, classId: number): Promise<Point[]> {
-    const result = await this.pointpartModel.findOne({
-      where: {
-        id: id,
-        classId: classId
-      },
-      include: [
-        {
-          model: Point,
-          include: [
-            {
-              model: Account,
-              attributes: ['studentId']
-            }
-          ],
-          attributes: ['point']
-        }
-      ]
-    });
-    return result.points;
-  }
+  // async GetPointPartWithListStudent(id: number, classId: number): Promise<Point[]> {
+  //   const result = await this.pointpartModel.findOne({
+  //     where: {
+  //       id: id,
+  //       classId: classId
+  //     },
+  //     include: [
+  //       {
+  //         model: Point,
+  //         include: [
+  //           {
+  //             model: Account,
+  //             attributes: ['studentId']
+  //           }
+  //         ],
+  //         attributes: ['point']
+  //       }
+  //     ]
+  //   });
+  //   return result.points;
+  // }
 
   async GetAllWithListStudent(classId: number): Promise<PointPart[]> {
     const result = await this.pointpartModel.findAll({
@@ -127,8 +128,10 @@ export class PointPartService {
       },
       include: [
         {
-          model: Point,
-          attributes: ['studentId', 'point']
+          model: ClassStudent,
+          through: {
+            as: 'point'
+          }
         }
       ]
     });

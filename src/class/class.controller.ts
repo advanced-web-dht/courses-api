@@ -127,6 +127,12 @@ export class ClassController {
     return this.classService.getMemberByRole(params.classId, params.role);
   }
 
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/:classId/grade-board')
+  async GetAllGradeOfClass(@Param('classId') classId: number): Promise<Class> {
+    return this.classService.GetAllGrade(classId);
+  }
+
   @Get('/:code/enroll')
   async GetClassToEnroll(@Param('code') code: string): Promise<Class> {
     const result = await this.classService.getClassByCodeToEnroll(code);

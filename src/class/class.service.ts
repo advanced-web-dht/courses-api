@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { nanoid } from 'nanoid';
-import { Op } from 'sequelize';
+import sequelize, { Op } from 'sequelize';
 
 import { Class } from './class.entity';
 import { ClassTeacher, Role } from '../entities/class-teacher.entity';
@@ -10,6 +10,8 @@ import { Account } from '../account/account.entity';
 import { createClassDto } from './class.dto/create-class.dto';
 import { AccountLogin } from 'src/auth/auth.interface';
 import { PointPart } from '../point-part/point-part.entity';
+import { Point } from '../point/point.entity';
+import * as helper from './class.helper';
 
 @Injectable()
 export class ClassService {
@@ -74,7 +76,7 @@ export class ClassService {
 
     // Check role
     const result = raw.map((cls) => {
-      this.setRoleForResult(cls, userId);
+      this.SetRoleForResult(cls, userId);
       return cls;
     });
     return result;
@@ -156,7 +158,7 @@ export class ClassService {
       const teacher = result.teachers.find((member) => member.id === accountId);
       const student = result.students.find((member) => member.accountId === accountId);
       if (teacher || student || result.owner.id === accountId) {
-        this.setRoleForResult(result, accountId);
+        this.SetRoleForResult(result, accountId);
         return result;
       }
       return null;
@@ -203,7 +205,7 @@ export class ClassService {
         }
       });
       if (result) {
-        this.setRoleForResult(result, accountId);
+        this.SetRoleForResult(result, accountId);
         return result;
       }
       return null;
@@ -275,7 +277,7 @@ export class ClassService {
     return result.teachers;
   }
 
-  setRoleForResult(cls: Class, userId: number): void {
+  SetRoleForResult(cls: Class, userId: number): void {
     if (cls.owner?.id === userId) {
       cls.setDataValue('role', 'owner');
     }
@@ -294,5 +296,38 @@ export class ClassService {
   async GetRole(accountId: number, classId: number): Promise<string> {
     const cls = await this.getClassById(classId, accountId);
     return cls.getDataValue('role');
+  }
+
+  async GetAllGrade(classId: number): Promise<Class> {
+    const cls = await this.classModel.findOne({
+      include: [
+        {
+          model: ClassStudent,
+          include: [
+            {
+              model: Account,
+              attributes: ['name', 'id', 'email']
+            },
+            {
+              model: PointPart,
+              through: {
+                as: 'point'
+              }
+            }
+          ]
+        },
+        {
+          model: PointPart
+        }
+      ],
+      where: { id: classId },
+      attributes: ['id', 'name', 'code']
+    });
+    const rationSum = helper.CalculateSumOfRatio(cls.grades);
+    cls.students.forEach((student) => {
+      const finalScore = helper.CalculateFinalGrade(student.points, rationSum);
+      student.setDataValue('final', finalScore);
+    });
+    return cls;
   }
 }

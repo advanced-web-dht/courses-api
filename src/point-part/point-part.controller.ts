@@ -61,11 +61,11 @@ export class PointPartController {
     }
   }
 
-  @Get('/:id/:classId')
-  async GetPointPartStudent(@Res() res: FastifyReply, @Param() param): Promise<void> {
-    const result = await this.pointpartService.GetPointPartWithListStudent(param.id, param.classId);
-    res.status(200).send({ result });
-  }
+  // @Get('/:id/:classId')
+  // async GetPointPartStudent(@Res() res: FastifyReply, @Param() param): Promise<void> {
+  //   const result = await this.pointpartService.GetPointPartWithListStudent(param.id, param.classId);
+  //   res.status(200).send({ result });
+  // }
 
   @Get('allpoint/:classId')
   async GetAllPointStudent(@Res() res: FastifyReply, @Param() param): Promise<void> {
@@ -91,7 +91,7 @@ export class PointPartController {
   async GetPointOfPointPart(@Res() res: FastifyReply, @Param('gradeId') gradeId): Promise<void> {
     try {
       const result = await this.pointpartService.GetAllPoint(gradeId);
-      res.status(200).send(result.points);
+      res.status(200).send(result);
     } catch {
       res.status(500).send({ isSuccess: false, message: 'Internal server error' });
     }
