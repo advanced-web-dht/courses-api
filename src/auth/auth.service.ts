@@ -17,7 +17,9 @@ export class AuthService {
     if (!user.password) {
       return null;
     }
-    if (user && bcrypt.compare(user.password, password)) {
+    const check = await bcrypt.compare(password, user.password);
+    console.log(check);
+    if (user && check) {
       return { name: user.name, username: user.username, id: user.id, studentId: user.studentId };
     }
     return null;

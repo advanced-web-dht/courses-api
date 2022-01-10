@@ -1,20 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+
 import { PointPart } from './point-part.entity';
 import { PointPart_checkDto } from './point-part.dto/point-part_check.dto';
-import { promises } from 'dns';
 import { Account } from '../account/account.entity';
-import { Class } from '../class/class.entity';
 import { Point } from '../point/point.entity';
 import { ClassStudent } from '../entities/class-student.entity';
+import { PointService } from '../point/point.service';
+import { CalculateFinalGrade } from '../class/class.helper';
+import sequelize, { Op } from 'sequelize';
 
 @Injectable()
 export class PointPartService {
   constructor(
     @InjectModel(PointPart)
     private pointpartModel: typeof PointPart,
-    @InjectModel(Class)
-    private classModel: typeof Class
+    @InjectModel(ClassStudent)
+    private classStudentModel: typeof ClassStudent,
+    private readonly pointService: PointService
   ) {}
   async addPointPart({ classId, name, ratio, order }: PointPart_checkDto): Promise<PointPart> {
     const info = {
@@ -24,6 +27,9 @@ export class PointPartService {
       order
     };
     const newPointPart = await this.pointpartModel.create(info);
+    const result = await this.classStudentModel.findAll({ where: { classId } });
+    const points = result.map((student) => ({ point: 0, studentId: student.studentId }));
+    await this.pointService.AddPointList({ points, classId, pointpartId: newPointPart.id });
     return newPointPart;
   }
   async getPointStructure(classId: string): Promise<PointPart[]> {
@@ -112,13 +118,8 @@ export class PointPartService {
     });
     return result;
   }
-  async markDone(id: number): Promise<PointPart> {
-    const line = await this.pointpartModel.findOne({ where: { id: id } });
-    line.set({
-      isDone: 1
-    });
-    await line.save();
-    return line;
+  async UpdateStatus(id: number, value: boolean): Promise<void> {
+    await this.pointpartModel.update({ isDone: value }, { where: { id } });
   }
 
   async GetAllPoint(gradeId: number): Promise<PointPart> {
@@ -130,11 +131,38 @@ export class PointPartService {
         {
           model: ClassStudent,
           through: {
-            as: 'point'
+            as: 'detail'
           }
         }
       ]
     });
+    return result;
+  }
+
+  async GetAllPointsOfStudentOfClass(studentId: string, classId: number): Promise<ClassStudent> {
+    const result = await this.classStudentModel.findOne({
+      where: { studentId, classId },
+      include: [
+        {
+          model: PointPart,
+          where: { classId },
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
+          through: {
+            as: 'detail',
+            attributes: { exclude: ['createdAt', 'updatedAt'] }
+          }
+        }
+      ]
+    });
+
+    result.grades.forEach((grade) => {
+      if (!grade.isDone) {
+        grade.detail.point = 0;
+      }
+    });
+    const ratioSum = result.grades.reduce((a, b) => a + b.ratio, 0);
+    const finalScore = CalculateFinalGrade(result.grades, ratioSum);
+    result.setDataValue('final', finalScore);
     return result;
   }
 }

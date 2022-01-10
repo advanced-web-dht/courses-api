@@ -32,5 +32,5 @@ export class PointPart extends Model {
   assignment: Assignment;
 
   @BelongsToMany(() => ClassStudent, () => Point, 'pointPartId')
-  points: Array<ClassStudent & { point: Point }>;
+  students: Array<ClassStudent & { detail: Point }>;
 }

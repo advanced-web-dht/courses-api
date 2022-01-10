@@ -310,8 +310,11 @@ export class ClassService {
             },
             {
               model: PointPart,
+              where: { classId },
+              attributes: { exclude: ['createdAt', 'updatedAt'] },
               through: {
-                as: 'point'
+                as: 'detail',
+                attributes: { exclude: ['createdAt', 'updatedAt'] }
               }
             }
           ]
@@ -320,13 +323,21 @@ export class ClassService {
           model: PointPart
         }
       ],
+      order: [
+        [{ model: ClassStudent, as: 'students' }, { model: PointPart, as: 'grades' }, 'order', 'ASC'],
+        [{ model: PointPart, as: 'grades' }, 'order', 'ASC']
+      ],
       where: { id: classId },
       attributes: ['id', 'name', 'code']
     });
-    const rationSum = helper.CalculateSumOfRatio(cls.grades);
+    const ratioSum = helper.CalculateSumOfRatio(cls.grades);
     cls.students.forEach((student) => {
-      const finalScore = helper.CalculateFinalGrade(student.points, rationSum);
-      student.setDataValue('final', finalScore);
+      const finalScore = helper.CalculateFinalGrade(student.grades, ratioSum);
+      if (finalScore) {
+        student.setDataValue('final', finalScore);
+      } else {
+        student.setDataValue('final', 0);
+      }
     });
     return cls;
   }

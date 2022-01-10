@@ -36,6 +36,11 @@ export class AccountService {
     return account;
   }
 
+  async getAccountById(id: number): Promise<Account> {
+    const account = await this.accountModel.findOne({ where: { id } });
+    return account;
+  }
+
   async createAccountGoogle(name: string, email: string): Promise<Account> {
     const info = {
       name,
