@@ -310,7 +310,6 @@ export class ClassService {
             },
             {
               model: PointPart,
-              where: { classId },
               attributes: { exclude: ['createdAt', 'updatedAt'] },
               through: {
                 as: 'detail',

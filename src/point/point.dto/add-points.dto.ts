@@ -2,7 +2,7 @@ import { IsArray, IsNumber } from 'class-validator';
 
 export class AddPointListDto {
   @IsArray()
-  points: Array<{ studentId: string; point: number }>;
+  points: Array<{ csId: number; point: number }>;
 
   @IsNumber()
   classId: number;

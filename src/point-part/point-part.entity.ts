@@ -31,6 +31,6 @@ export class PointPart extends Model {
   @HasOne(() => Assignment)
   assignment: Assignment;
 
-  @BelongsToMany(() => ClassStudent, () => Point, 'pointPartId')
+  @BelongsToMany(() => ClassStudent, () => Point, 'pointPartId', 'csId')
   students: Array<ClassStudent & { detail: Point }>;
 }

@@ -101,7 +101,7 @@ export class PointPartController {
   @Get('/:gradeId/points')
   async GetPointOfPointPart(@Res() res: FastifyReply, @Param('gradeId') gradeId: number): Promise<void> {
     try {
-      const result = await this.pointpartService.GetAllPoint(gradeId);
+      const result = await this.pointpartService.GetAllPoints(gradeId);
       res.status(200).send(result);
     } catch {
       res.status(500).send({ isSuccess: false, message: 'Internal server error' });
@@ -117,6 +117,16 @@ export class PointPartController {
         req.user.studentId = account.studentId;
       }
       const result = await this.pointpartService.GetAllPointsOfStudentOfClass(req.user.studentId, classId);
+      res.status(200).send(result);
+    } catch (err) {
+      res.status(500).send({ isSuccess: false });
+    }
+  }
+
+  @Get('/class/:classId/done')
+  async GetDoneGrades(@Res() res: FastifyReply, @Req() req: FastifyRequest, @Param('classId') classId: number): Promise<void> {
+    try {
+      const result = await this.pointpartService.GetDoneGradeOfClass(classId);
       res.status(200).send(result);
     } catch (err) {
       res.status(500).send({ isSuccess: false });

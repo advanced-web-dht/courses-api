@@ -1,4 +1,4 @@
-import { Column, Model, Table, DataType, ForeignKey, BelongsTo, PrimaryKey, BelongsToMany } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, ForeignKey, BelongsTo, BelongsToMany, PrimaryKey } from 'sequelize-typescript';
 import { Class } from '../class/class.entity';
 import { Account } from '../account/account.entity';
 import { Point } from '../point/point.entity';
@@ -7,12 +7,14 @@ import { PointPart } from '../point-part/point-part.entity';
 @Table({ timestamps: false })
 export class ClassStudent extends Model {
   @PrimaryKey
-  @Column({ allowNull: false, type: DataType.STRING(15) })
+  @Column({ allowNull: false, autoIncrement: true })
+  id: number;
+
+  @Column({ allowNull: false, type: DataType.STRING(15), unique: 'class_student_pk' })
   studentId: string;
 
-  @PrimaryKey
   @ForeignKey(() => Class)
-  @Column
+  @Column({ unique: 'class_student_pk' })
   classId: number;
 
   @ForeignKey(() => Account)
@@ -27,6 +29,6 @@ export class ClassStudent extends Model {
   @BelongsTo(() => Class, 'classId')
   class: Class;
 
-  @BelongsToMany(() => PointPart, () => Point, 'studentId')
+  @BelongsToMany(() => PointPart, () => Point, 'csId')
   grades: Array<PointPart & { detail: Point }>;
 }
