@@ -126,7 +126,8 @@ export class PointPartController {
   @Get('/class/:classId/done')
   async GetDoneGrades(@Res() res: FastifyReply, @Req() req: FastifyRequest, @Param('classId') classId: number): Promise<void> {
     try {
-      const result = await this.pointpartService.GetDoneGradeOfClass(classId);
+      const { id } = req.user;
+      const result = await this.pointpartService.GetDoneGradeOfClass(classId, id);
       res.status(200).send(result);
     } catch (err) {
       res.status(500).send({ isSuccess: false });

@@ -25,4 +25,7 @@ export class Review extends Model {
 
   @BelongsTo(() => PointPart)
   grade: PointPart;
+
+  @BelongsTo(() => Account)
+  requester: Account;
 }

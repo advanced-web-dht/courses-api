@@ -17,9 +17,6 @@ export class Comment extends Model {
   @Column({ type: DataType.STRING(1000), allowNull: false })
   message: string;
 
-  @Column({ type: DataType.ENUM('student', 'teacher'), allowNull: false })
-  sourceType: string;
-
   @BelongsTo(() => Review)
   review: Review;
 

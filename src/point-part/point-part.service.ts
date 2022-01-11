@@ -8,6 +8,7 @@ import { Point } from '../point/point.entity';
 import { ClassStudent } from '../entities/class-student.entity';
 import { CalculateFinalGrade } from '../class/class.helper';
 import { PointService } from '../point/point.service';
+import { Review } from '../review/review.entity';
 
 @Injectable()
 export class PointPartService {
@@ -164,9 +165,15 @@ export class PointPartService {
     return result;
   }
 
-  async GetDoneGradeOfClass(classId: number): Promise<PointPart[]> {
+  async GetDoneGradeOfClass(classId: number, accountId: number): Promise<PointPart[]> {
     const result = await this.pointpartModel.findAll({
-      where: { classId, isDone: true }
+      where: { classId, isDone: true },
+      include: [
+        {
+          model: Review,
+          attributes: ['id']
+        }
+      ]
     });
     return result;
   }

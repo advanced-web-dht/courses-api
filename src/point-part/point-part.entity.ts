@@ -1,4 +1,4 @@
-import { Column, Model, Table, DataType, BelongsTo, ForeignKey, HasOne, BelongsToMany } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, BelongsTo, ForeignKey, HasOne, BelongsToMany, HasMany } from 'sequelize-typescript';
 import { Class } from '../class/class.entity';
 import { Assignment } from '../assignment/assignment.entity';
 import { Point } from '../point/point.entity';
@@ -38,4 +38,7 @@ export class PointPart extends Model {
 
   @BelongsToMany(() => Account, () => Review)
   requesters: Array<Account & { detail: Review }>;
+
+  @HasMany(() => Review)
+  reviews: Review[];
 }

@@ -48,7 +48,6 @@ export const RolesGuard = (roles: Role[]): Type<CanActivate> => {
       const request = context.switchToHttp().getRequest();
       const user = request.user;
       const classId = request.params.classId || request.body.classId;
-
       //Get role
       const role = await this.classService.GetRole(user.id, Number(classId));
 
