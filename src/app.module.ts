@@ -15,6 +15,7 @@ import { PointPartModule } from './point-part/point-part.module';
 import { AssignmentModule } from './assignment/assignment.module';
 import { PointModule } from './point/point.module';
 import { RoleModule } from './role/role.module';
+import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -31,7 +32,8 @@ import { RoleModule } from './role/role.module';
     PointPartModule,
     AssignmentModule,
     PointModule,
-    RoleModule
+    RoleModule,
+    ReviewModule
   ],
   controllers: [AppController],
   providers: [AppService]

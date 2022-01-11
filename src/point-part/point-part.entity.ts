@@ -3,6 +3,8 @@ import { Class } from '../class/class.entity';
 import { Assignment } from '../assignment/assignment.entity';
 import { Point } from '../point/point.entity';
 import { ClassStudent } from '../entities/class-student.entity';
+import { Review } from '../review/review.entity';
+import { Account } from '../account/account.entity';
 
 @Table
 export class PointPart extends Model {
@@ -33,4 +35,7 @@ export class PointPart extends Model {
 
   @BelongsToMany(() => ClassStudent, () => Point, 'pointPartId', 'csId')
   students: Array<ClassStudent & { detail: Point }>;
+
+  @BelongsToMany(() => Account, () => Review)
+  requesters: Array<Account & { detail: Review }>;
 }

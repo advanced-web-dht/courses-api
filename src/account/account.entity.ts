@@ -3,6 +3,8 @@ import { Column, Model, Table, DataType, BelongsToMany, HasMany } from 'sequeliz
 import { Class } from '../class/class.entity';
 import { ClassTeacher } from '../entities/class-teacher.entity';
 import { ClassStudent } from '../entities/class-student.entity';
+import { PointPart } from '../point-part/point-part.entity';
+import { Review } from '../review/review.entity';
 
 @Table
 export class Account extends Model {
@@ -32,4 +34,7 @@ export class Account extends Model {
 
   @HasMany(() => Class, 'ownerId')
   oClasses: Array<Class>;
+
+  @BelongsToMany(() => PointPart, () => Review, 'accountId')
+  requestedReviews: Array<PointPart & { detail: Review }>;
 }
