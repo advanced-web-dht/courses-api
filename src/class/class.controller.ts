@@ -145,4 +145,20 @@ export class ClassController {
     const result = await this.classService.getClassByCode(code, req.user.id);
     return result;
   }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/:id/student/:studentId')
+  async GetStudentOfClass(
+    @Req() req: FastifyRequest,
+    @Res() res: FastifyReply,
+    @Param('id') id: number,
+    @Param('studentId') studentId: string
+  ): Promise<void> {
+    try {
+      const result = await this.classService.GetStudentById(id, studentId);
+      res.status(200).send(result);
+    } catch (e) {
+      res.status(500).send({ isSuccess: false });
+    }
+  }
 }

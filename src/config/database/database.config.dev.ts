@@ -16,9 +16,6 @@ export default registerAs('sequelize.config', (): SequelizeModuleOptions => {
     },
     synchronize: true,
     autoLoadModels: true,
-    timezone: '+07:00',
-    dialectOptions: {
-      useUTC: false
-    }
+    timezone: '+07:00'
   };
 });

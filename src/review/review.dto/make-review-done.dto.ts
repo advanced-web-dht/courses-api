@@ -1,18 +1,14 @@
 import { IsNumber, IsString, Length, Min, Max } from 'class-validator';
 
-export class AddReviewDto {
+export class MakeReviewDoneDto {
   @IsNumber()
   pointPartId: number;
 
   @IsNumber()
-  prePoint: number;
-
-  @IsNumber()
   @Min(0)
   @Max(10)
-  expectedPoint: number;
+  finalPoint: number;
 
-  @IsString()
-  @Length(10, 1000)
-  content: string;
+  @IsNumber()
+  csId: number;
 }

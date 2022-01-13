@@ -28,4 +28,13 @@ export class PointService {
     };
     await this.pointModel.create(info);
   }
+
+  async UpdatePoint(csId: number, pointPartId: number, point: number): Promise<void> {
+    await this.pointModel.update(
+      { point },
+      {
+        where: { csId, pointPartId }
+      }
+    );
+  }
 }

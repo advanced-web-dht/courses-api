@@ -1,13 +1,15 @@
-import { Body, Controller, Get, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { AuthGuard } from '@nestjs/passport';
 
 import { ReviewService } from './review.service';
 import { AddReviewDto } from './review.dto/add-review.dto';
+import { MakeReviewDoneDto } from './review.dto/make-review-done.dto';
+import { PointService } from '../point/point.service';
 
 @Controller('review')
 export class ReviewController {
-  constructor(private readonly reviewService: ReviewService) {}
+  constructor(private readonly reviewService: ReviewService, private readonly pointService: PointService) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Get('/account/grade/:pointPartId')
@@ -66,10 +68,29 @@ export class ReviewController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get('/:reviewId')
-  async GetReview(@Res() res: FastifyReply, @Param('reviewId') reviewId: number): Promise<void> {
+  @Put('/:reviewId/done')
+  async MakeReviewDone(
+    @Res() res: FastifyReply,
+    @Req() req: FastifyRequest,
+    @Param('reviewId') reviewId: number,
+    @Body() body: MakeReviewDoneDto
+  ): Promise<void> {
     try {
-      const result = await this.reviewService.GetReviewById(reviewId);
+      await this.reviewService.UpdateReviewStatus(reviewId, body.finalPoint);
+      await this.pointService.UpdatePoint(body.csId, body.pointPartId, body.finalPoint);
+
+      res.status(202).send({ isSuccess: true });
+    } catch {
+      res.status(500).send({ isSuccess: false });
+    }
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/:reviewId')
+  async GetReview(@Res() res: FastifyReply, @Req() req: FastifyRequest, @Param('reviewId') reviewId: number): Promise<void> {
+    try {
+      const { studentId } = req.user;
+      const result = await this.reviewService.GetReviewById(reviewId, studentId);
       res.status(200).send(result);
     } catch {
       res.status(500).send({ isSuccess: false });

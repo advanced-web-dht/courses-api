@@ -5,6 +5,8 @@ import { Comment } from '../entities/comment.entity';
 import { Account } from '../account/account.entity';
 import { PointPart } from '../point-part/point-part.entity';
 import { AddReviewDto } from './review.dto/add-review.dto';
+import { ClassStudent } from '../entities/class-student.entity';
+import { MakeReviewDoneDto } from './review.dto/make-review-done.dto';
 
 @Injectable()
 export class ReviewService {
@@ -76,12 +78,13 @@ export class ReviewService {
     return result;
   }
 
-  async GetReviewById(id: number): Promise<Review> {
+  async GetReviewById(id: number, studentId: string): Promise<Review> {
     const result = this.reviewModel.findOne({
       include: [
         {
           model: PointPart,
-          attributes: ['id', 'classId', 'name']
+          attributes: ['id', 'classId', 'name'],
+          include: [{ model: ClassStudent, where: { studentId }, through: { attributes: [] } }]
         },
         {
           model: Account,
@@ -101,5 +104,14 @@ export class ReviewService {
       attributes: { exclude: ['updatedAt'] }
     });
     return result;
+  }
+
+  async UpdateReviewStatus(reviewId: number, finalPoint: number): Promise<void> {
+    await this.reviewModel.update(
+      { isDone: true, finalPoint },
+      {
+        where: { id: reviewId }
+      }
+    );
   }
 }

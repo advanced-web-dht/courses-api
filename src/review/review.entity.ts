@@ -20,6 +20,18 @@ export class Review extends Model {
   @Column({ type: DataType.STRING(10000) })
   content: string;
 
+  @Column
+  prePoint: number;
+
+  @Column
+  expectedPoint: number;
+
+  @Column
+  finalPoint: number;
+
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  isDone: boolean;
+
   @HasMany(() => Comment)
   comments: Comment[];
 

@@ -340,4 +340,9 @@ export class ClassService {
     });
     return cls;
   }
+
+  async GetStudentById(classId: number, studentId: string): Promise<ClassStudent> {
+    const student = await this.classStudent.findOne({ where: { classId, studentId } });
+    return student;
+  }
 }
