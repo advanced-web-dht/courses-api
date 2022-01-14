@@ -5,6 +5,7 @@ import { ClassTeacher } from '../entities/class-teacher.entity';
 import { ClassStudent } from '../entities/class-student.entity';
 import { PointPart } from '../point-part/point-part.entity';
 import { Review } from '../review/review.entity';
+import { Notification } from 'src/notification/notification.entity';
 
 @Table
 export class Account extends Model {
@@ -37,4 +38,7 @@ export class Account extends Model {
 
   @BelongsToMany(() => PointPart, () => Review, 'accountId')
   requestedReviews: Array<PointPart & { detail: Review }>;
+
+  @HasMany(() => Notification)
+  notifications: Array<Notification>;
 }

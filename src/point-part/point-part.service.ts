@@ -9,6 +9,8 @@ import { ClassStudent } from '../entities/class-student.entity';
 import { CalculateFinalGrade } from '../class/class.helper';
 import { PointService } from '../point/point.service';
 import { Review } from '../review/review.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { DoneEvent } from './point-part.event/mark-grade-done.event';
 
 @Injectable()
 export class PointPartService {
@@ -17,7 +19,8 @@ export class PointPartService {
     private pointpartModel: typeof PointPart,
     @InjectModel(ClassStudent)
     private classStudentModel: typeof ClassStudent,
-    private readonly pointService: PointService
+    private readonly pointService: PointService,
+    private eventEmitter: EventEmitter2
   ) {}
   async addPointPart({ classId, name, ratio, order }: PointPart_checkDto): Promise<PointPart> {
     const info = {
@@ -119,7 +122,15 @@ export class PointPartService {
     return result;
   }
   async UpdateStatus(id: number, value: boolean): Promise<void> {
-    await this.pointpartModel.update({ isDone: value }, { where: { id } });
+    const target = await this.pointpartModel.findOne({ where: { id } });
+    target.set({ isDone: true });
+    target.save();
+    const doneEvent: DoneEvent = {
+      classId: target.classId,
+      message: `Cột điểm ${target.name} đã hoàn thành. Bạn có thể xem trên phần điểm số của mình!!`,
+      topic: 'Điểm'
+    };
+    this.eventEmitter.emit('point-part.done', doneEvent);
   }
 
   async GetAllPoints(gradeId: number): Promise<Array<ClassStudent & { detail: Point }>> {

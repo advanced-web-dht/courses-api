@@ -20,13 +20,13 @@ export class Review extends Model {
   @Column({ type: DataType.STRING(10000) })
   content: string;
 
-  @Column
+  @Column({ type: DataType.FLOAT, allowNull: false })
   prePoint: number;
 
-  @Column
+  @Column({ type: DataType.FLOAT, allowNull: false })
   expectedPoint: number;
 
-  @Column
+  @Column({ type: DataType.FLOAT })
   finalPoint: number;
 
   @Column({ type: DataType.BOOLEAN, defaultValue: false })

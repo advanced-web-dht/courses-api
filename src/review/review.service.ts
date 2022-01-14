@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Review } from './review.entity';
 import { Comment } from '../entities/comment.entity';
 import { Account } from '../account/account.entity';
@@ -7,6 +8,7 @@ import { PointPart } from '../point-part/point-part.entity';
 import { AddReviewDto } from './review.dto/add-review.dto';
 import { ClassStudent } from '../entities/class-student.entity';
 import { MakeReviewDoneDto } from './review.dto/make-review-done.dto';
+import { NewCommentEvent } from './review.event';
 
 @Injectable()
 export class ReviewService {
@@ -14,7 +16,8 @@ export class ReviewService {
     @InjectModel(Review)
     private reviewModel: typeof Review,
     @InjectModel(Comment)
-    private commentModel: typeof Comment
+    private commentModel: typeof Comment,
+    private eventEmitter: EventEmitter2
   ) {}
 
   async GetReviewOfGradeOfAccount(accountId: number, pointPartId: number): Promise<Review> {
@@ -57,6 +60,14 @@ export class ReviewService {
       message
     };
     const result = await this.commentModel.create(newComment);
+    // const doneEvent: NewCommentEvent = {
+    //   reviewId: reviewId,
+    //   message: '',
+    //   topic: 'Phúc khảo',
+
+    // };
+    // this.eventEmitter.emit('point-part.done', doneEvent);
+
     return result;
   }
 

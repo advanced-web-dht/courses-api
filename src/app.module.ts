@@ -16,6 +16,8 @@ import { AssignmentModule } from './assignment/assignment.module';
 import { PointModule } from './point/point.module';
 import { RoleModule } from './role/role.module';
 import { ReviewModule } from './review/review.module';
+import { NotificationModule } from './notification/notification.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -24,6 +26,7 @@ import { ReviewModule } from './review/review.module';
       imports: [ConfigModule],
       useFactory: process.env.NODE_ENV === 'development' ? databaseConfigDev : databaseConfigProd
     }),
+    EventEmitterModule.forRoot(),
     EntityModule,
     ClassModule,
     AccountModule,
@@ -33,7 +36,8 @@ import { ReviewModule } from './review/review.module';
     AssignmentModule,
     PointModule,
     RoleModule,
-    ReviewModule
+    ReviewModule,
+    NotificationModule
   ],
   controllers: [AppController],
   providers: [AppService]

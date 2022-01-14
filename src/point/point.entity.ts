@@ -14,6 +14,6 @@ export class Point extends Model {
   @Column({ allowNull: false })
   pointPartId: number;
 
-  @Column({ allowNull: false })
+  @Column({ allowNull: false, type: DataType.FLOAT })
   point: number;
 }
