@@ -7,9 +7,10 @@ import { Review } from './review.entity';
 import { Comment } from '../entities/comment.entity';
 import { PointModule } from '../point/point.module';
 import { ReviewListener } from './review.listener';
+import { ClassModule } from 'src/class/class.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Review, Comment]), AuthModule, PointModule],
+  imports: [SequelizeModule.forFeature([Review, Comment]), AuthModule, PointModule, ClassModule],
   providers: [ReviewService, ReviewListener],
   controllers: [ReviewController]
 })

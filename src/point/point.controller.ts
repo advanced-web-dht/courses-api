@@ -21,17 +21,17 @@ export class PointController {
     }
   }
 
-  @Post()
-  async AddPoint(@Res() res: FastifyReply, @Body() body): Promise<void> {
-    try {
-      const result = await this.pointService.AddPoint(body);
-      res.status(201).send({ isSuccess: true });
-    } catch (err) {
-      if (err.parent.errno === 1062) {
-        res.status(409).send({ isSuccess: false });
-      } else {
-        res.status(500).send({ isSuccess: false });
-      }
-    }
-  }
+  // @Post()
+  // async AddPoint(@Res() res: FastifyReply, @Body() body): Promise<void> {
+  //   try {
+  //     const result = await this.pointService.AddPoint(body);
+  //     res.status(201).send({ isSuccess: true });
+  //   } catch (err) {
+  //     if (err.parent.errno === 1062) {
+  //       res.status(409).send({ isSuccess: false });
+  //     } else {
+  //       res.status(500).send({ isSuccess: false });
+  //     }
+  //   }
+  // }
 }

@@ -12,22 +12,22 @@ export class PointService {
     private readonly accountService: AccountService
   ) {}
 
-  async AddPointList({ points, classId, pointpartId }: AddPointListDto): Promise<void> {
-    const pointListToAdd = points.map((point) => ({ ...point, classId, pointPartId: pointpartId }));
+  async AddPointList({ points, classId, pointPartId }: AddPointListDto): Promise<void> {
+    const pointListToAdd = points.map((point) => ({ ...point, classId, pointPartId }));
     console.log(pointListToAdd);
     await this.pointModel.bulkCreate(pointListToAdd, { updateOnDuplicate: ['point'] });
   }
 
-  async AddPoint({ point, classId, pointpartId, studentId }): Promise<void> {
-    const id = await this.accountService.getAccountByStudentId(studentId);
-    const info = {
-      classId: classId,
-      accountId: id,
-      point: point as number,
-      pointPartId: pointpartId
-    };
-    await this.pointModel.create(info);
-  }
+  // async AddPoint({ point, classId, pointpartId, studentId }): Promise<void> {
+  //   const id = await this.accountService.getAccountByStudentId(studentId);
+  //   const info = {
+  //     classId: classId,
+  //     accountId: id,
+  //     point: point as number,
+  //     pointPartId: pointpartId
+  //   };
+  //   await this.pointModel.create(info);
+  // }
 
   async UpdatePoint(csId: number, pointPartId: number, point: number): Promise<void> {
     await this.pointModel.update(

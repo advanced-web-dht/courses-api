@@ -8,5 +8,5 @@ export class AddPointListDto {
   classId: number;
 
   @IsNumber()
-  pointpartId: number;
+  pointPartId: number;
 }

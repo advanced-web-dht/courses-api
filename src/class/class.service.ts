@@ -345,4 +345,13 @@ export class ClassService {
     const student = await this.classStudent.findOne({ where: { classId, studentId } });
     return student;
   }
+
+  async GetTeachersOfClass(classId: number): Promise<Class> {
+    const target = await this.classModel.findOne({
+      where: { id: classId },
+      include: [{ model: Account, as: 'teachers', attributes: ['id'] }],
+      attributes: ['ownerId']
+    });
+    return target;
+  }
 }

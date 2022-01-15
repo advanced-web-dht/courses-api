@@ -32,7 +32,7 @@ export class PointPartService {
     const newPointPart = await this.pointpartModel.create(info);
     const result = await this.classStudentModel.findAll({ where: { classId } });
     const points = result.map((student) => ({ point: 0, csId: student.id }));
-    await this.pointService.AddPointList({ points, classId, pointpartId: newPointPart.id });
+    await this.pointService.AddPointList({ points, classId, pointPartId: newPointPart.id });
     return newPointPart;
   }
   async getPointStructure(classId: string): Promise<PointPart[]> {

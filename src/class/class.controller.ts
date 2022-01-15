@@ -105,7 +105,7 @@ export class ClassController {
     @Param('classId') classId: number
   ): Promise<void> {
     const check = jwt.verify(token, process.env.SECRET_KEY);
-    if (check) {
+    if ((check && (check as jwt.JwtPayload)).email === user.email) {
       try {
         await this.classService.AddTeacher(user.id, classId);
         res.status(201).send({ isSuccess: true });

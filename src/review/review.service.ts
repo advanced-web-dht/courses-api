@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+
 import { Review } from './review.entity';
 import { Comment } from '../entities/comment.entity';
 import { Account } from '../account/account.entity';
 import { PointPart } from '../point-part/point-part.entity';
 import { AddReviewDto } from './review.dto/add-review.dto';
 import { ClassStudent } from '../entities/class-student.entity';
-import { MakeReviewDoneDto } from './review.dto/make-review-done.dto';
-import { NewCommentEvent } from './review.event';
+import { NewCommentEvent, NewReviewEvent, ReviewDoneEvent } from './review.event';
 
 @Injectable()
 export class ReviewService {
@@ -50,6 +50,13 @@ export class ReviewService {
       accountId
     };
     const result = await this.reviewModel.create(newReview);
+
+    const newReviewEvent: NewReviewEvent = {
+      reviewId: result.id,
+      topic: 'Phúc khảo'
+    };
+    this.eventEmitter.emit('new.review', newReviewEvent);
+
     return result;
   }
 
@@ -60,13 +67,13 @@ export class ReviewService {
       message
     };
     const result = await this.commentModel.create(newComment);
-    // const doneEvent: NewCommentEvent = {
-    //   reviewId: reviewId,
-    //   message: '',
-    //   topic: 'Phúc khảo',
 
-    // };
-    // this.eventEmitter.emit('point-part.done', doneEvent);
+    const newCommentEvent: NewCommentEvent = {
+      reviewId: reviewId,
+      topic: 'Phúc khảo',
+      accountId
+    };
+    this.eventEmitter.emit('new-comment.review', newCommentEvent);
 
     return result;
   }
@@ -118,11 +125,21 @@ export class ReviewService {
   }
 
   async UpdateReviewStatus(reviewId: number, finalPoint: number): Promise<void> {
-    await this.reviewModel.update(
-      { isDone: true, finalPoint },
-      {
-        where: { id: reviewId }
+    const review = await this.reviewModel.findOne({
+      include: [{ model: Account, attributes: ['studentId', 'name', 'id'] }, { model: PointPart }],
+      where: {
+        id: reviewId
       }
-    );
+    });
+    review.set('isDone', true);
+    review.set('finalPoint', finalPoint);
+    await review.save();
+    const newCommentEvent: ReviewDoneEvent = {
+      topic: 'Phúc khảo',
+      accountId: review.requester.id,
+      message: `Yêu cầu phúc khảo cột điểm "${review.grade.name}" đã được giải quyết`,
+      classId: review.grade.classId
+    };
+    this.eventEmitter.emit('done.review', newCommentEvent);
   }
 }
