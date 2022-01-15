@@ -188,4 +188,8 @@ export class PointPartService {
     });
     return result;
   }
+
+  async DeletePointPart(id: number): Promise<void> {
+    await this.pointpartModel.destroy({ where: { id } });
+  }
 }

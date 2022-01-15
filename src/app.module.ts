@@ -12,7 +12,6 @@ import { AccountModule } from './account/account.module';
 import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { PointPartModule } from './point-part/point-part.module';
-import { AssignmentModule } from './assignment/assignment.module';
 import { PointModule } from './point/point.module';
 import { RoleModule } from './role/role.module';
 import { ReviewModule } from './review/review.module';
@@ -33,7 +32,6 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     AuthModule,
     MailModule,
     PointPartModule,
-    AssignmentModule,
     PointModule,
     RoleModule,
     ReviewModule,

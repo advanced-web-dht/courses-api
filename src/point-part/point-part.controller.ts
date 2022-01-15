@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Req, Res, UseGuards, Delete } from '@nestjs/common';
 import { PointPartService } from './point-part.service';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { AuthGuard } from '@nestjs/passport';
@@ -129,6 +129,16 @@ export class PointPartController {
       const { id } = req.user;
       const result = await this.pointpartService.GetDoneGradeOfClass(classId, id);
       res.status(200).send(result);
+    } catch (err) {
+      res.status(500).send({ isSuccess: false });
+    }
+  }
+
+  @Delete('/:id')
+  async DeleteGrade(@Res() res: FastifyReply, @Req() req: FastifyRequest, @Param('id') id: number): Promise<void> {
+    try {
+      await this.pointpartService.DeletePointPart(id);
+      res.status(204).send({ isSuccess: true });
     } catch (err) {
       res.status(500).send({ isSuccess: false });
     }
