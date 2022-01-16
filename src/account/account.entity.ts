@@ -24,7 +24,7 @@ export class Account extends Model {
   @Column({ type: DataType.STRING(15) })
   studentId: string;
 
-  @Column({ type: DataType.ENUM('active', 'inactive', 'blocked', 'deleted'), defaultValue: 'active' })
+  @Column({ type: DataType.ENUM('active', 'inactive', 'blocked', 'deleted'), defaultValue: 'inactive' })
   status: string;
 
   @BelongsToMany(() => Class, () => ClassTeacher, 'accountId')

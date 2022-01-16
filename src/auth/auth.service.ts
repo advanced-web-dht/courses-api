@@ -20,10 +20,11 @@ export class AuthService {
     const check = await bcrypt.compare(password, user.password);
     console.log(check);
     if (user && check) {
-      return { name: user.name, username: user.username, id: user.id, studentId: user.studentId };
+      return { name: user.name, username: user.username, id: user.id, studentId: user.studentId, status: user.status };
     }
     return null;
   }
+
   async login(user: AccountLogin): Promise<Record<string, string>> {
     return {
       username: user.username,
@@ -66,6 +67,7 @@ export class AuthService {
       throw new UnauthorizedException();
     }
   }
+
   async registerUser(userInfo: SignUpDto): Promise<boolean> {
     const saltOrRounds = 10;
     const hash = await bcrypt.hash(userInfo.password, saltOrRounds);
@@ -73,7 +75,28 @@ export class AuthService {
     try {
       await this.accountService.createAccount(userInfo.name, userInfo.email, hash, userInfo.username);
       return true;
-    } catch (e) {
+    } catch {
+      return false;
+    }
+  }
+
+  async VerifyAccount(email: string): Promise<boolean> {
+    try {
+      const result = await this.accountService.UpdateAccountStatus(email, 'active');
+      return result;
+    } catch {
+      return false;
+    }
+  }
+
+  async ResetPassword(email: string, password): Promise<boolean> {
+    try {
+      const saltOrRounds = 10;
+      const hash = await bcrypt.hash(password, saltOrRounds);
+
+      const result = await this.accountService.UpdatePassword(email, hash);
+      return result;
+    } catch {
       return false;
     }
   }

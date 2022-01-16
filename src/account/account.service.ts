@@ -99,6 +99,7 @@ export class AccountService {
     await user.save();
     return user;
   }
+
   async AddMemberFromFileToAccount(member: Record<string, any>): Promise<void> {
     member.forEach(async (items) => {
       const classToAdd = {
@@ -107,5 +108,27 @@ export class AccountService {
       };
       await this.accountModel.create(classToAdd);
     });
+  }
+
+  async UpdateAccountStatus(email: string, status: string): Promise<boolean> {
+    const target = await this.accountModel.findOne({ where: { email } });
+    if (target) {
+      target.set('status', status);
+      await target.save();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  async UpdatePassword(email: string, password: string): Promise<boolean> {
+    const target = await this.accountModel.findOne({ where: { email } });
+    if (target) {
+      target.set('password', password);
+      await target.save();
+      return true;
+    } else {
+      return false;
+    }
   }
 }

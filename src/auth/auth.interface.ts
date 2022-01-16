@@ -4,4 +4,5 @@ export interface AccountLogin {
   id: number;
   email?: string;
   studentId: string;
+  status?: string;
 }
