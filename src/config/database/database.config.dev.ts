@@ -12,9 +12,11 @@ export default registerAs('sequelize.config', (): SequelizeModuleOptions => {
     port: parseInt(process.env.DB_PORT),
     dialect: dialect,
     define: {
-      timestamps: true
+      timestamps: true,
+      paranoid: true
     },
     synchronize: true,
-    autoLoadModels: true
+    autoLoadModels: true,
+    timezone: '+07:00'
   };
 });

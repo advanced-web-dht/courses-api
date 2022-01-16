@@ -1,15 +1,16 @@
-import { Body, Controller, Get, Param, Post, Put, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Req, Res, UseGuards, Delete } from '@nestjs/common';
 import { PointPartService } from './point-part.service';
-import { FastifyReply } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../role/roles.decorator';
 import { Role } from '../role/role.enum';
 import { PointPart_checkDto } from './point-part.dto/point-part_check.dto';
+import { AccountService } from '../account/account.service';
 
-// @UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'))
 @Controller('pointpart')
 export class PointPartController {
-  constructor(private readonly pointpartService: PointPartService) {}
+  constructor(private readonly pointpartService: PointPartService, private readonly accountServices: AccountService) {}
 
   @Post('/add')
   @Roles(Role.owner, Role.teacher)
@@ -61,21 +62,22 @@ export class PointPartController {
     }
   }
 
-  @Get('/:id/:classId')
-  async GetPointPartStudent(@Res() res: FastifyReply, @Param() param): Promise<void> {
-    const result = await this.pointpartService.GetPointPartWithListStudent(param.id, param.classId);
-    res.status(200).send({ result });
-  }
+  // @Get('/:id/:classId')
+  // async GetPointPartStudent(@Res() res: FastifyReply, @Param() param): Promise<void> {
+  //   const result = await this.pointpartService.GetPointPartWithListStudent(param.id, param.classId);
+  //   res.status(200).send({ result });
+  // }
 
   @Get('allpoint/:classId')
   async GetAllPointStudent(@Res() res: FastifyReply, @Param() param): Promise<void> {
     const result = await this.pointpartService.GetAllWithListStudent(param.classId);
     res.status(200).send(result);
   }
+
   @Put('/done')
-  async updateStatus(@Res() res, @Body() req): Promise<void> {
+  async MarkGradeDone(@Res() res: FastifyReply, @Body('id') id: number): Promise<void> {
     try {
-      await this.pointpartService.markDone(req.id);
+      await this.pointpartService.UpdateStatus(id, true);
       res.status(201).send({ isSuccess: true });
     } catch (err) {
       if (err.parent.errno === 1062) {
@@ -83,6 +85,62 @@ export class PointPartController {
       } else {
         res.status(500).send({ isSuccess: false });
       }
+    }
+  }
+
+  @Put('/pending')
+  async MarkGradePending(@Res() res: FastifyReply, @Body('id') id: number): Promise<void> {
+    try {
+      await this.pointpartService.UpdateStatus(id, false);
+      res.status(201).send({ isSuccess: true });
+    } catch {
+      res.status(500).send({ isSuccess: false });
+    }
+  }
+
+  @Get('/:gradeId/points')
+  async GetPointOfPointPart(@Res() res: FastifyReply, @Param('gradeId') gradeId: number): Promise<void> {
+    try {
+      const result = await this.pointpartService.GetAllPoints(gradeId);
+      res.status(200).send(result);
+    } catch {
+      res.status(500).send({ isSuccess: false, message: 'Internal server error' });
+    }
+  }
+
+  @Get('/student/class/:classId')
+  async GetAllPointOfStudent(@Res() res: FastifyReply, @Req() req: FastifyRequest, @Param('classId') classId: number): Promise<void> {
+    try {
+      if (!req.user.studentId) {
+        console.log(req.user);
+        const account = await this.accountServices.getAccountById(req.user.id);
+        req.user.studentId = account.studentId;
+      }
+      const result = await this.pointpartService.GetAllPointsOfStudentOfClass(req.user.studentId, classId);
+      res.status(200).send(result);
+    } catch (err) {
+      res.status(500).send({ isSuccess: false });
+    }
+  }
+
+  @Get('/class/:classId/done')
+  async GetDoneGrades(@Res() res: FastifyReply, @Req() req: FastifyRequest, @Param('classId') classId: number): Promise<void> {
+    try {
+      const { id } = req.user;
+      const result = await this.pointpartService.GetDoneGradeOfClass(classId, id);
+      res.status(200).send(result);
+    } catch (err) {
+      res.status(500).send({ isSuccess: false });
+    }
+  }
+
+  @Delete('/:id')
+  async DeleteGrade(@Res() res: FastifyReply, @Req() req: FastifyRequest, @Param('id') id: number): Promise<void> {
+    try {
+      await this.pointpartService.DeletePointPart(id);
+      res.status(204).send({ isSuccess: true });
+    } catch (err) {
+      res.status(500).send({ isSuccess: false });
     }
   }
 }

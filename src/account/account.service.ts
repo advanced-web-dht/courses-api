@@ -3,15 +3,16 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 
 import { Account } from './account.entity';
-import { ClassAccount } from '../entities/class-account.entity';
+import { ClassTeacher } from '../entities/class-teacher.entity';
+import { UpdateAccountDto } from './account.dto/update-account.dto';
 
 @Injectable()
 export class AccountService {
   constructor(
     @InjectModel(Account)
     private accountModel: typeof Account,
-    @InjectModel(ClassAccount)
-    private classAccountModel: typeof ClassAccount
+    @InjectModel(ClassTeacher)
+    private classAccountModel: typeof ClassTeacher
   ) {}
 
   async findUser(username: string): Promise<Account> {
@@ -32,6 +33,11 @@ export class AccountService {
 
   async getAccountByEmail(email: string): Promise<Account> {
     const account = await this.accountModel.findOne({ where: { email: email } });
+    return account;
+  }
+
+  async getAccountById(id: number): Promise<Account> {
+    const account = await this.accountModel.findOne({ where: { id } });
     return account;
   }
 
@@ -79,12 +85,12 @@ export class AccountService {
     }
   }
 
-  async getAccountbyStudentId(studentId: string): Promise<number> {
+  async getAccountByStudentId(studentId: string): Promise<number> {
     const user = await this.accountModel.findOne({ where: { studentId: studentId } });
     return user.id;
   }
 
-  async UpdateAccount(id: number, User: any): Promise<Account> {
+  async UpdateAccount(id: number, User: UpdateAccountDto): Promise<Account> {
     const user = await this.accountModel.findOne({ where: { id: id } });
     user.set({
       name: User.name,
@@ -93,6 +99,7 @@ export class AccountService {
     await user.save();
     return user;
   }
+
   async AddMemberFromFileToAccount(member: Record<string, any>): Promise<void> {
     member.forEach(async (items) => {
       const classToAdd = {
@@ -101,5 +108,27 @@ export class AccountService {
       };
       await this.accountModel.create(classToAdd);
     });
+  }
+
+  async UpdateAccountStatus(email: string, status: string): Promise<boolean> {
+    const target = await this.accountModel.findOne({ where: { email } });
+    if (target) {
+      target.set('status', status);
+      await target.save();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  async UpdatePassword(email: string, password: string): Promise<boolean> {
+    const target = await this.accountModel.findOne({ where: { email } });
+    if (target) {
+      target.set('password', password);
+      await target.save();
+      return true;
+    } else {
+      return false;
+    }
   }
 }

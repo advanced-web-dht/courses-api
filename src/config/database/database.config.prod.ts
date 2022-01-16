@@ -19,7 +19,8 @@ export default registerAs('sequelize.config', (): SequelizeModuleOptions => {
       }
     },
     define: {
-      timestamps: true
+      timestamps: true,
+      paranoid: true
     },
     synchronize: true,
     autoLoadModels: true,

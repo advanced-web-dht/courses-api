@@ -2,9 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Point } from './point.entity';
 import { AccountService } from '../account/account.service';
-import { Point_checkDto } from './point.dto/point_check.dto';
-import { Account } from '../account/account.entity';
-import { PointPart } from '../point-part/point-part.entity';
+import { AddPointListDto } from './point.dto/add-points.dto';
 
 @Injectable()
 export class PointService {
@@ -13,26 +11,30 @@ export class PointService {
     private pointModel: typeof Point,
     private readonly accountService: AccountService
   ) {}
-  async addPointFromFile({ point, classId, pointpartId }: Point_checkDto): Promise<void> {
-    point.forEach(async (items) => {
-      const id = await this.accountService.getAccountbyStudentId(items.studentId);
-      const info = {
-        classId: classId,
-        accountId: id,
-        point: items.point as number,
-        pointPartId: pointpartId
-      };
-      await this.pointModel.create(info);
-    });
+
+  async AddPointList({ points, classId, pointPartId }: AddPointListDto): Promise<void> {
+    const pointListToAdd = points.map((point) => ({ ...point, classId, pointPartId }));
+    console.log(pointListToAdd);
+    await this.pointModel.bulkCreate(pointListToAdd, { updateOnDuplicate: ['point'] });
   }
-  async addPoint({ point, classId, pointpartId, studentId }): Promise<void> {
-    const id = await this.accountService.getAccountbyStudentId(studentId);
-    const info = {
-      classId: classId,
-      accountId: id,
-      point: point as number,
-      pointPartId: pointpartId
-    };
-    await this.pointModel.create(info);
+
+  // async AddPoint({ point, classId, pointpartId, studentId }): Promise<void> {
+  //   const id = await this.accountService.getAccountByStudentId(studentId);
+  //   const info = {
+  //     classId: classId,
+  //     accountId: id,
+  //     point: point as number,
+  //     pointPartId: pointpartId
+  //   };
+  //   await this.pointModel.create(info);
+  // }
+
+  async UpdatePoint(csId: number, pointPartId: number, point: number): Promise<void> {
+    await this.pointModel.update(
+      { point },
+      {
+        where: { csId, pointPartId }
+      }
+    );
   }
 }

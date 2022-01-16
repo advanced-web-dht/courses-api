@@ -4,6 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { FastifyRequest, FastifyReply } from 'fastify';
 
 import { Account } from './account.entity';
+import { UpdateAccountDto } from './account.dto/update-account.dto';
 
 @Controller('accounts')
 export class AccountController {
@@ -23,8 +24,8 @@ export class AccountController {
 
   @UseGuards(AuthGuard('jwt'))
   @Put()
-  async updateAccount(@Req() req: FastifyRequest): Promise<Account> {
-    const result = await this.accountService.UpdateAccount(req.user.id, req.body);
+  async updateAccount(@Req() req: FastifyRequest, @Body() body: UpdateAccountDto): Promise<Account> {
+    const result = await this.accountService.UpdateAccount(req.user.id, body);
     return result;
   }
 

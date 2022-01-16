@@ -12,8 +12,12 @@ import { AccountModule } from './account/account.module';
 import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { PointPartModule } from './point-part/point-part.module';
-import { AssignmentModule } from './assignment/assignment.module';
 import { PointModule } from './point/point.module';
+import { RoleModule } from './role/role.module';
+import { ReviewModule } from './review/review.module';
+import { NotificationModule } from './notification/notification.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -22,14 +26,18 @@ import { PointModule } from './point/point.module';
       imports: [ConfigModule],
       useFactory: process.env.NODE_ENV === 'development' ? databaseConfigDev : databaseConfigProd
     }),
+    EventEmitterModule.forRoot(),
     EntityModule,
     ClassModule,
     AccountModule,
     AuthModule,
     MailModule,
     PointPartModule,
-    AssignmentModule,
-    PointModule
+    PointModule,
+    RoleModule,
+    ReviewModule,
+    NotificationModule,
+    AdminModule
   ],
   controllers: [AppController],
   providers: [AppService]

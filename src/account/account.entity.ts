@@ -1,7 +1,11 @@
-import { Column, Model, Table, DataType, BelongsToMany } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, BelongsToMany, HasMany } from 'sequelize-typescript';
 
 import { Class } from '../class/class.entity';
-import { ClassAccount } from '../entities/class-account.entity';
+import { ClassTeacher } from '../entities/class-teacher.entity';
+import { ClassStudent } from '../entities/class-student.entity';
+import { PointPart } from '../point-part/point-part.entity';
+import { Review } from '../review/review.entity';
+import { Notification } from 'src/notification/notification.entity';
 
 @Table
 export class Account extends Model {
@@ -20,9 +24,21 @@ export class Account extends Model {
   @Column({ type: DataType.STRING(15) })
   studentId: string;
 
-  @Column({ type: DataType.ENUM('active', 'inactive', 'blocked', 'deleted'), defaultValue: 'active' })
+  @Column({ type: DataType.ENUM('active', 'inactive', 'blocked', 'deleted'), defaultValue: 'inactive' })
   status: string;
 
-  @BelongsToMany(() => Class, () => ClassAccount)
-  classes: Array<Class & { ClassAccount: ClassAccount }>;
+  @BelongsToMany(() => Class, () => ClassTeacher, 'accountId')
+  tClasses: Array<Class & { ClassAccount: ClassTeacher }>;
+
+  @HasMany(() => ClassStudent)
+  sClasses: Array<ClassStudent>;
+
+  @HasMany(() => Class, 'ownerId')
+  oClasses: Array<Class>;
+
+  @BelongsToMany(() => PointPart, () => Review, 'accountId')
+  requestedReviews: Array<PointPart & { detail: Review }>;
+
+  @HasMany(() => Notification)
+  notifications: Array<Notification>;
 }

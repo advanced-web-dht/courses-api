@@ -50,4 +50,49 @@ export class MailService {
 				<p>Chúc bạn một ngày vui vẻ!!</p>`
     });
   }
+
+  async sendAccountVerifyEmail(email: string, url: string): Promise<void> {
+    await this.transport.sendMail({
+      to: email,
+      from: '"No Reply" <noreply@fitclass.com>',
+      subject: '[Kích hoạt tài khoản]',
+      html: `<p>Xin chào,</p>
+				<p>Bạn vừa đăng ký tại khoản tại Fit Classroom</p>
+				<p>
+				    Vui lòng nhấn 
+				    <a href=${url}>"Xác thực"</a> 
+				</p>
+				<p>Chúc bạn một ngày vui vẻ!!</p>`
+    });
+  }
+
+  async SendReactivateEmail(email: string, url: string): Promise<void> {
+    await this.transport.sendMail({
+      to: email,
+      from: '"No Reply" <noreply@fitclass.com>',
+      subject: '[Kích hoạt tài khoản]',
+      html: `<p>Xin chào,</p>
+				<p>Bạn vừa yêu cầu xác thực tại khoản</p>
+				<p>
+				    Vui lòng nhấn 
+				    <a href=${url}>"Xác thực"</a> 
+				</p>
+				<p>Chúc bạn một ngày vui vẻ!!</p>`
+    });
+  }
+
+  async SendResetPasswordEmail(email: string, url: string): Promise<void> {
+    await this.transport.sendMail({
+      to: email,
+      from: '"No Reply" <noreply@fitclass.com>',
+      subject: '[Reset mật khẩu]',
+      html: `<p>Xin chào,</p>
+				<p>Bạn vừa yêu cầu lấy lại mật khẩu</p>
+				<p>
+				    Vui lòng nhấn 
+				    <a href=${url}>"Reset"</a> 
+				</p>
+				<p>Chúc bạn một ngày vui vẻ!!</p>`
+    });
+  }
 }
