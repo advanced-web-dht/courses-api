@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Request, UseGuards, Body, Res } from '@nestjs/common';
+import { Controller, Get, Post, Request, UseGuards, Body, Res, Req } from '@nestjs/common';
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { AuthGuard } from '@nestjs/passport';
 import * as jwt from 'jsonwebtoken';
@@ -44,7 +44,6 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   @Post('/signin')
   async login(@Request() req: FastifyRequest, @Res() res: FastifyReply): Promise<void> {
-    console.log(req.user);
     if (req.user.status !== 'active') {
       res.status(403).send({ isSuccess: false });
     } else {
@@ -114,5 +113,12 @@ export class AuthController {
     } catch {
       res.status(500).send({ isSuccess: false });
     }
+  }
+
+  @UseGuards(AuthGuard('admin'))
+  @Post('/signin/admin')
+  async LoginAdmin(@Req() req: FastifyRequest, @Res() res: FastifyReply): Promise<void> {
+    const result = await this.authService.LoginAdmin(req.user);
+    res.status(200).send(result);
   }
 }

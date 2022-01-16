@@ -17,6 +17,7 @@ import { RoleModule } from './role/role.module';
 import { ReviewModule } from './review/review.module';
 import { NotificationModule } from './notification/notification.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -35,7 +36,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     PointModule,
     RoleModule,
     ReviewModule,
-    NotificationModule
+    NotificationModule,
+    AdminModule
   ],
   controllers: [AppController],
   providers: [AppService]

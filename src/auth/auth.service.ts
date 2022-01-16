@@ -7,10 +7,11 @@ import { AccountService } from '../account/account.service';
 import { AccountLogin } from './auth.interface';
 import { SignInGoogleDto } from './auth.dto/sign-in.dto';
 import { SignUpDto } from './auth.dto/sign-up.dto';
+import { AdminService } from '../admin/admin.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private accountService: AccountService, private jwtService: JwtService) {}
+  constructor(private accountService: AccountService, private jwtService: JwtService, private readonly adminService: AdminService) {}
 
   async validateUser(username: string, password: string): Promise<AccountLogin | null> {
     const user = await this.accountService.findUser(username);
@@ -99,5 +100,27 @@ export class AuthService {
     } catch {
       return false;
     }
+  }
+
+  async ValidateAdmin(username: string, password: string): Promise<AccountLogin | null> {
+    const user = await this.adminService.GetAdminForAuth(username);
+    if (!user.password) {
+      return null;
+    }
+    const check = await bcrypt.compare(password, user.password);
+
+    if (user && check) {
+      return { name: user.name, username: user.username, id: user.id, email: user.email };
+    }
+    return null;
+  }
+
+  async LoginAdmin(user: AccountLogin): Promise<Record<string, string | number>> {
+    return {
+      username: user.username,
+      name: user.name,
+      id: user.id,
+      accessToken: this.jwtService.sign(user)
+    };
   }
 }

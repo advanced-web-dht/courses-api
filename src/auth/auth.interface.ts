@@ -3,6 +3,6 @@ export interface AccountLogin {
   username: string;
   id: number;
   email?: string;
-  studentId: string;
+  studentId?: string;
   status?: string;
 }
