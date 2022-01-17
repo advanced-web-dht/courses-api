@@ -1,4 +1,4 @@
-import { Column, Model, Table, DataType, BelongsToMany, HasMany, BelongsTo, ForeignKey } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, BelongsToMany, HasMany, BelongsTo, ForeignKey, Index } from 'sequelize-typescript';
 import { Account } from '../account/account.entity';
 import { ClassTeacher } from '../entities/class-teacher.entity';
 import { PointPart } from '../point-part/point-part.entity';
@@ -6,6 +6,7 @@ import { ClassStudent } from '../entities/class-student.entity';
 
 @Table
 export class Class extends Model {
+  @Index({ type: 'FULLTEXT', name: 'search_idx' })
   @Column({ type: DataType.STRING(255) })
   name: string;
 

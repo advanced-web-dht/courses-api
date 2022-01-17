@@ -28,7 +28,6 @@ export class PointPartListener {
         classId
       }
     });
-    console.log(students);
 
     const notifications = [];
     students.forEach((student) => {

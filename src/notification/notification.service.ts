@@ -20,8 +20,6 @@ export class NotificationService {
   }
 
   async UpdateStatus(id: number): Promise<void> {
-    console.log(id);
-
     await this.notificationModel.update({ isRead: 1 }, { where: { id } });
   }
 

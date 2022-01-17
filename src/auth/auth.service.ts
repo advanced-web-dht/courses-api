@@ -19,7 +19,7 @@ export class AuthService {
       return null;
     }
     const check = await bcrypt.compare(password, user.password);
-    console.log(check);
+
     if (user && check) {
       return { name: user.name, username: user.username, id: user.id, studentId: user.studentId, status: user.status };
     }
@@ -83,7 +83,7 @@ export class AuthService {
 
   async VerifyAccount(email: string): Promise<boolean> {
     try {
-      const result = await this.accountService.UpdateAccountStatus(email, 'active');
+      const result = await this.accountService.UpdateAccountStatus('active', email);
       return result;
     } catch {
       return false;
@@ -120,7 +120,7 @@ export class AuthService {
       username: user.username,
       name: user.name,
       id: user.id,
-      accessToken: this.jwtService.sign(user)
+      accessToken: this.jwtService.sign(user, { secret: process.env.ADMIN_SECRET_KEY, expiresIn: '2d' })
     };
   }
 }
