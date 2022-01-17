@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { AccountLogin } from './auth.interface';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'admin-jwt') {
+export class AdminJwtStrategy extends PassportStrategy(Strategy, 'admin-jwt') {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

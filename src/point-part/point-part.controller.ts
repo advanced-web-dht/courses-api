@@ -112,7 +112,6 @@ export class PointPartController {
   async GetAllPointOfStudent(@Res() res: FastifyReply, @Req() req: FastifyRequest, @Param('classId') classId: number): Promise<void> {
     try {
       if (!req.user.studentId) {
-        console.log(req.user);
         const account = await this.accountServices.getAccountById(req.user.id);
         req.user.studentId = account.studentId;
       }

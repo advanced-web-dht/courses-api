@@ -14,7 +14,7 @@ export class PointService {
 
   async AddPointList({ points, classId, pointPartId }: AddPointListDto): Promise<void> {
     const pointListToAdd = points.map((point) => ({ ...point, classId, pointPartId }));
-    console.log(pointListToAdd);
+
     await this.pointModel.bulkCreate(pointListToAdd, { updateOnDuplicate: ['point'] });
   }
 

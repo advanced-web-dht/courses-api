@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Res, UseGuards, Request, Req, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Res, UseGuards, Request, Req, Param, Query } from '@nestjs/common';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { AuthGuard } from '@nestjs/passport';
 import * as jwt from 'jsonwebtoken';
@@ -89,7 +89,7 @@ export class ClassController {
     @Param('classId') classId: number
   ): Promise<void> {
     try {
-      this.classService.AddStudentList(body, classId);
+      await this.classService.AddStudentList(body, classId);
       res.status(201).send({ isSuccess: true });
     } catch (e) {
       res.status(500).send({ isSuccess: false });
@@ -158,6 +158,17 @@ export class ClassController {
       const result = await this.classService.GetStudentById(id, studentId);
       res.status(200).send(result);
     } catch (e) {
+      res.status(500).send({ isSuccess: false });
+    }
+  }
+
+  @UseGuards(AuthGuard('admin-jwt'))
+  @Get('/admin')
+  async GetClassList(@Res() res: FastifyReply, @Query('sort') sort: string, @Query('search') search: string): Promise<void> {
+    try {
+      const result = await this.classService.GetClassList(sort, search);
+      res.status(200).send(result);
+    } catch {
       res.status(500).send({ isSuccess: false });
     }
   }

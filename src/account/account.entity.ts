@@ -1,4 +1,4 @@
-import { Column, Model, Table, DataType, BelongsToMany, HasMany } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, BelongsToMany, HasMany, Index } from 'sequelize-typescript';
 
 import { Class } from '../class/class.entity';
 import { ClassTeacher } from '../entities/class-teacher.entity';
@@ -12,12 +12,14 @@ export class Account extends Model {
   @Column({ type: DataType.STRING(16), unique: true })
   username: string;
 
+  @Index({ type: 'FULLTEXT', name: 'search_idx' })
   @Column({ type: DataType.STRING(50), unique: true })
   email: string;
 
   @Column({ type: DataType.STRING(255) })
   password: string;
 
+  @Index({ type: 'FULLTEXT', name: 'search_idx' })
   @Column({ type: DataType.STRING(50), allowNull: false })
   name: string;
 

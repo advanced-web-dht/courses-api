@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Op } from 'sequelize';
+import sequelize, { Op } from 'sequelize';
 
 import { Account } from './account.entity';
 import { ClassTeacher } from '../entities/class-teacher.entity';
@@ -37,7 +37,7 @@ export class AccountService {
   }
 
   async getAccountById(id: number): Promise<Account> {
-    const account = await this.accountModel.findOne({ where: { id } });
+    const account = await this.accountModel.findOne({ where: { id }, attributes: { exclude: ['password'] } });
     return account;
   }
 
@@ -110,8 +110,8 @@ export class AccountService {
     });
   }
 
-  async UpdateAccountStatus(email: string, status: string): Promise<boolean> {
-    const target = await this.accountModel.findOne({ where: { email } });
+  async UpdateAccountStatus(status: string, email?: string, id?: number): Promise<boolean> {
+    const target = await this.accountModel.findOne({ where: { [Op.or]: [{ email }, { id }] } });
     if (target) {
       target.set('status', status);
       await target.save();
@@ -130,5 +130,28 @@ export class AccountService {
     } else {
       return false;
     }
+  }
+
+  async GetAllAccount(sort = 'DESC', search?: string): Promise<Account[]> {
+    const accounts = await this.accountModel.findAll({
+      where: search ? sequelize.literal(`MATCH (name, email) AGAINST("${search}")`) : null,
+      order: [['createdAt', sort]],
+      attributes: { exclude: ['password'] }
+    });
+    return accounts;
+  }
+
+  async UpdateStudentId(id: number, studentId?: string): Promise<boolean> {
+    const user = await this.accountModel.findOne({ where: { id: id } });
+    if (user) {
+      if (studentId) {
+        user.set({ studentId });
+      } else {
+        user.set('studentId', null);
+      }
+      await user.save();
+      return true;
+    }
+    return false;
   }
 }

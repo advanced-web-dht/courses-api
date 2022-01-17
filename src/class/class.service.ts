@@ -354,4 +354,12 @@ export class ClassService {
     });
     return target;
   }
+
+  async GetClassList(sort = 'DESC', search?: string): Promise<Class[]> {
+    const target = await this.classModel.findAll({
+      where: search ? sequelize.literal(`MATCH (name) AGAINST("${search}")`) : null,
+      order: [['createdAt', sort]]
+    });
+    return target;
+  }
 }

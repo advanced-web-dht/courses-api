@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import sequelize, { Op } from 'sequelize';
+import * as bcrypt from 'bcrypt';
+
 import { Admin } from './admin.entity';
 import { CreateAdminDto } from './admin.dto/create-admin.dto';
-import { Op } from 'sequelize';
 
 @Injectable()
 export class AdminService {
@@ -11,10 +13,14 @@ export class AdminService {
     private readonly adminModel: typeof Admin
   ) {}
 
-  async CreateAdminAccount(payload: CreateAdminDto, creatorId?: string): Promise<boolean> {
+  async CreateAdminAccount(payload: CreateAdminDto, creatorId?: number): Promise<boolean> {
     try {
+      const saltOrRounds = 10;
+      const hash = await bcrypt.hash(payload.password, saltOrRounds);
+
       const newAdmin = {
         ...payload,
+        password: hash,
         creatorId
       };
       await this.adminModel.create(newAdmin);
@@ -27,18 +33,21 @@ export class AdminService {
   async GetAdminById(id: number): Promise<Admin> {
     const admin = await this.adminModel.findOne({
       where: { id },
-      include: [{ model: Admin, attributes: ['id', 'name'] }],
+      include: [{ model: Admin, attributes: ['id', 'name'], as: 'creator' }],
       attributes: { exclude: ['password', 'username'] }
     });
     return admin;
   }
 
-  async GetAllAdmin(): Promise<Admin[]> {
+  async GetAllAdmin(sort = 'DESC', search?: string): Promise<Admin[]> {
     const admins = await this.adminModel.findAll({
-      attributes: { exclude: ['password', 'username'] }
+      where: search ? sequelize.literal(`MATCH (name, email) AGAINST("${search}")`) : null,
+      order: [['createdAt', sort]],
+      attributes: { exclude: ['password'] }
     });
     return admins;
   }
+
   async GetAdminForAuth(username: string): Promise<Admin> {
     const admin = await this.adminModel.findOne({
       where: {
