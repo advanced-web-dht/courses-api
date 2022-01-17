@@ -1,19 +1,20 @@
-import { Body, Controller, Get, Param, Post, Put, Req, Res, UseGuards, Delete } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Req, Res, UseGuards, Delete, Patch } from '@nestjs/common';
 import { PointPartService } from './point-part.service';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { AuthGuard } from '@nestjs/passport';
-import { Roles } from '../role/roles.decorator';
 import { Role } from '../role/role.enum';
 import { PointPart_checkDto } from './point-part.dto/point-part_check.dto';
 import { AccountService } from '../account/account.service';
+import { RolesGuard } from '../role/roles.guard';
+import { UpdatePointPartDTO } from './point-part.dto/update-pointpart.dto';
+import { UpdateOrderDto } from './point-part.dto/update-order.dto';
 
-@UseGuards(AuthGuard('jwt'))
 @Controller('pointpart')
 export class PointPartController {
   constructor(private readonly pointpartService: PointPartService, private readonly accountServices: AccountService) {}
 
+  @UseGuards(RolesGuard([Role.owner, Role.teacher]))
   @Post('/add')
-  @Roles(Role.owner, Role.teacher)
   async AddPointPart(@Res() res: FastifyReply, @Body() payload: PointPart_checkDto): Promise<void> {
     try {
       const result = await this.pointpartService.addPointPart(payload);
@@ -27,17 +28,18 @@ export class PointPartController {
     }
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get('/:classID')
   async GetPointStructure(@Res() res: FastifyReply, @Param('classID') id: string): Promise<void> {
     const result = await this.pointpartService.getPointStructure(id);
     res.status(200).send({ result });
   }
 
-  @Put()
-  @Roles(Role.owner, Role.teacher)
-  async updatePointPart(@Res() res, @Body() req): Promise<void> {
+  @UseGuards(RolesGuard([Role.owner, Role.teacher]))
+  @Put('/:id')
+  async updatePointPart(@Res() res: FastifyReply, @Body() body: UpdatePointPartDTO, @Param('id') id: number): Promise<void> {
     try {
-      await this.pointpartService.UpdatePointPart(req);
+      await this.pointpartService.UpdatePointPart(body, id);
       res.status(201).send({ isSuccess: true });
     } catch (err) {
       if (err.parent.errno === 1062) {
@@ -48,10 +50,11 @@ export class PointPartController {
     }
   }
 
+  @UseGuards(RolesGuard([Role.owner, Role.teacher]))
   @Put('/order')
-  async updateOrder(@Res() res, @Body() req): Promise<void> {
+  async updateOrder(@Res() res: FastifyReply, @Body() body: UpdateOrderDto): Promise<void> {
     try {
-      await this.pointpartService.UpdateOrder(req.order);
+      await this.pointpartService.UpdateOrder(body.order);
       res.status(201).send({ isSuccess: true });
     } catch (err) {
       if (err.parent.errno === 1062) {
@@ -68,14 +71,15 @@ export class PointPartController {
   //   res.status(200).send({ result });
   // }
 
-  @Get('allpoint/:classId')
-  async GetAllPointStudent(@Res() res: FastifyReply, @Param() param): Promise<void> {
-    const result = await this.pointpartService.GetAllWithListStudent(param.classId);
-    res.status(200).send(result);
-  }
+  // @Get('allpoint/:classId')
+  // async GetAllPointStudent(@Res() res: FastifyReply, @Param() param): Promise<void> {
+  //   const result = await this.pointpartService.GetAllWithListStudent(param.classId);
+  //   res.status(200).send(result);
+  // }
 
-  @Put('/done')
-  async MarkGradeDone(@Res() res: FastifyReply, @Body('id') id: number): Promise<void> {
+  @UseGuards(RolesGuard([Role.owner, Role.teacher]))
+  @Patch('/:id/done')
+  async MarkGradeDone(@Res() res: FastifyReply, @Param('id') id: number): Promise<void> {
     try {
       await this.pointpartService.UpdateStatus(id, true);
       res.status(201).send({ isSuccess: true });
@@ -88,8 +92,9 @@ export class PointPartController {
     }
   }
 
-  @Put('/pending')
-  async MarkGradePending(@Res() res: FastifyReply, @Body('id') id: number): Promise<void> {
+  @UseGuards(RolesGuard([Role.owner, Role.teacher]))
+  @Patch('/:id/pending')
+  async MarkGradePending(@Res() res: FastifyReply, @Param('id') id: number): Promise<void> {
     try {
       await this.pointpartService.UpdateStatus(id, false);
       res.status(201).send({ isSuccess: true });
@@ -98,6 +103,7 @@ export class PointPartController {
     }
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get('/:gradeId/points')
   async GetPointOfPointPart(@Res() res: FastifyReply, @Param('gradeId') gradeId: number): Promise<void> {
     try {
@@ -108,6 +114,7 @@ export class PointPartController {
     }
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get('/student/class/:classId')
   async GetAllPointOfStudent(@Res() res: FastifyReply, @Req() req: FastifyRequest, @Param('classId') classId: number): Promise<void> {
     try {
@@ -122,6 +129,7 @@ export class PointPartController {
     }
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get('/class/:classId/done')
   async GetDoneGrades(@Res() res: FastifyReply, @Req() req: FastifyRequest, @Param('classId') classId: number): Promise<void> {
     try {
@@ -133,7 +141,8 @@ export class PointPartController {
     }
   }
 
-  @Delete('/:id')
+  @UseGuards(RolesGuard([Role.owner, Role.teacher]))
+  @Delete('/:id/class/:classId')
   async DeleteGrade(@Res() res: FastifyReply, @Req() req: FastifyRequest, @Param('id') id: number): Promise<void> {
     try {
       await this.pointpartService.DeletePointPart(id);

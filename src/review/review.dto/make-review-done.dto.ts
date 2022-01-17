@@ -11,4 +11,7 @@ export class MakeReviewDoneDto {
 
   @IsNumber()
   csId: number;
+
+  @IsNumber()
+  classId: number;
 }

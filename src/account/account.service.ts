@@ -111,7 +111,7 @@ export class AccountService {
   }
 
   async UpdateAccountStatus(status: string, email?: string, id?: number): Promise<boolean> {
-    const target = await this.accountModel.findOne({ where: { [Op.or]: [{ email }, { id }] } });
+    const target = await this.accountModel.findOne({ where: { [Op.or]: [{ email: email || null }, { id: id || null }] } });
     if (target) {
       target.set('status', status);
       await target.save();

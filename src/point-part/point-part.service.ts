@@ -11,6 +11,7 @@ import { PointService } from '../point/point.service';
 import { Review } from '../review/review.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { DoneEvent } from './point-part.event/mark-grade-done.event';
+import { UpdatePointPartDTO } from './point-part.dto/update-pointpart.dto';
 
 @Injectable()
 export class PointPartService {
@@ -45,7 +46,8 @@ export class PointPartService {
     });
     return pointStructure;
   }
-  async UpdatePointPart({ id, name, ratio }: Record<string, string | number>): Promise<PointPart> {
+
+  async UpdatePointPart({ name, ratio }: UpdatePointPartDTO, id: number): Promise<PointPart> {
     const line = await this.pointpartModel.findOne({ where: { id: id } });
     line.set({
       name: name,

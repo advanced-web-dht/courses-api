@@ -6,6 +6,8 @@ import { ReviewService } from './review.service';
 import { AddReviewDto } from './review.dto/add-review.dto';
 import { MakeReviewDoneDto } from './review.dto/make-review-done.dto';
 import { PointService } from '../point/point.service';
+import { RolesGuard } from '../role/roles.guard';
+import { Role } from '../role/role.enum';
 
 @Controller('review')
 export class ReviewController {
@@ -56,7 +58,7 @@ export class ReviewController {
     }
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(RolesGuard([Role.owner, Role.teacher]))
   @Get('/class/:classId')
   async GetReviewsOfClass(@Res() res: FastifyReply, @Req() req: FastifyRequest, @Param('classId') classId: number): Promise<void> {
     try {
@@ -67,7 +69,7 @@ export class ReviewController {
     }
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(RolesGuard([Role.owner, Role.teacher]))
   @Put('/:reviewId/done')
   async MakeReviewDone(
     @Res() res: FastifyReply,

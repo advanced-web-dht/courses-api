@@ -64,6 +64,7 @@ export class AuthController {
   async VerifyAccount(@Res() res: FastifyReply, @Body('token') token: string): Promise<void> {
     try {
       const check = jwt.verify(token, process.env.SECRET_KEY);
+
       if (check) {
         const result = await this.authService.VerifyAccount((check as jwt.JwtPayload).email);
         if (result) {

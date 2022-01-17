@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Res, UseGuards, Request, Req, Param, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req, Request, Res, UseGuards } from '@nestjs/common';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { AuthGuard } from '@nestjs/passport';
 import * as jwt from 'jsonwebtoken';
@@ -9,6 +9,8 @@ import { createClassDto } from './class.dto/create-class.dto';
 import { MailService } from '../mail/mail.service';
 import { AccountService } from '../account/account.service';
 import { Account } from '../account/account.entity';
+import { RolesGuard } from '../role/roles.guard';
+import { Role } from '../role/role.enum';
 
 @Controller('classes')
 export class ClassController {
@@ -81,7 +83,7 @@ export class ClassController {
     }
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(RolesGuard([Role.owner, Role.teacher]))
   @Post('/:classId/list')
   async AddStudentFromList(
     @Res() res: FastifyReply,
@@ -127,7 +129,7 @@ export class ClassController {
     return this.classService.getMemberByRole(params.classId, params.role);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(RolesGuard([Role.owner, Role.teacher]))
   @Get('/:classId/grade-board')
   async GetAllGradeOfClass(@Param('classId') classId: number): Promise<Class> {
     return this.classService.GetAllGrade(classId);
@@ -146,12 +148,12 @@ export class ClassController {
     return result;
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Get('/:id/student/:studentId')
+  @UseGuards(RolesGuard([Role.owner, Role.teacher]))
+  @Get('/:classId/student/:studentId')
   async GetStudentOfClass(
     @Req() req: FastifyRequest,
     @Res() res: FastifyReply,
-    @Param('id') id: number,
+    @Param('classId') id: number,
     @Param('studentId') studentId: string
   ): Promise<void> {
     try {
