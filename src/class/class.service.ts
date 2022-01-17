@@ -362,4 +362,26 @@ export class ClassService {
     });
     return target;
   }
+
+  async GetClassByIdWithoutRole(id): Promise<Class> {
+    const target = await this.classModel.findOne({
+      where: { id },
+      include: [
+        {
+          model: Account,
+          as: 'teachers',
+          attributes: ['name', 'id']
+        },
+        {
+          model: Account,
+          as: 'owner',
+          attributes: ['name', 'id']
+        },
+        {
+          model: ClassStudent
+        }
+      ]
+    });
+    return target;
+  }
 }

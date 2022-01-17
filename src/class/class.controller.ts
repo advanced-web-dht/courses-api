@@ -174,4 +174,15 @@ export class ClassController {
       res.status(500).send({ isSuccess: false });
     }
   }
+
+  @UseGuards(AuthGuard('admin-jwt'))
+  @Get('/:id/admin')
+  async GetClassByIdAdmin(@Res() res: FastifyReply, @Param('id') id: number): Promise<void> {
+    try {
+      const result = await this.classService.GetClassByIdWithoutRole(id);
+      res.status(200).send(result);
+    } catch {
+      res.status(500).send({ isSuccess: false });
+    }
+  }
 }
