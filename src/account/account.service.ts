@@ -44,7 +44,8 @@ export class AccountService {
   async createAccountGoogle(name: string, email: string): Promise<Account> {
     const info = {
       name,
-      email
+      email,
+      status: 'active'
     };
     const newAccount = await this.accountModel.create(info);
     return newAccount;
