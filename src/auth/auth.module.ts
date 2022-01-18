@@ -8,20 +8,22 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { MailModule } from '../mail/mail.module';
+import { AdminStrategy } from './admin.strategy';
+import { AdminJwtStrategy } from './admin-jwt.strategy';
 
 @Module({
-	imports: [
-		ConfigModule.forRoot(),
-		forwardRef(() => AccountModule),
-		PassportModule,
-		JwtModule.register({
-			secret: process.env.SECRET_KEY,
-			signOptions: { expiresIn: process.env.JWT_AGE }
-		}),
-		MailModule
-	],
-	controllers: [AuthController],
-	providers: [AuthService, LocalStrategy, JwtStrategy],
-	exports: [AuthService]
+  imports: [
+    ConfigModule.forRoot(),
+    forwardRef(() => AccountModule),
+    PassportModule,
+    JwtModule.register({
+      secret: process.env.SECRET_KEY,
+      signOptions: { expiresIn: process.env.JWT_AGE }
+    }),
+    MailModule
+  ],
+  controllers: [AuthController],
+  providers: [AuthService, LocalStrategy, JwtStrategy, AdminStrategy, AdminJwtStrategy],
+  exports: [AuthService]
 })
 export class AuthModule {}

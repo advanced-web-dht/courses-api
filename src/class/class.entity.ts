@@ -1,24 +1,42 @@
-import { Column, Model, Table, DataType, BelongsToMany } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, BelongsToMany, HasMany, BelongsTo, ForeignKey, Index } from 'sequelize-typescript';
 import { Account } from '../account/account.entity';
-import { ClassAccount } from '../entities/class-account.entity';
+import { ClassTeacher } from '../entities/class-teacher.entity';
+import { PointPart } from '../point-part/point-part.entity';
+import { ClassStudent } from '../entities/class-student.entity';
 
 @Table
 export class Class extends Model {
-	@Column({ type: DataType.STRING(255) })
-	name: string;
+  @Index({ type: 'FULLTEXT', name: 'search_idx' })
+  @Column({ type: DataType.STRING(255) })
+  name: string;
 
-	@Column({ type: DataType.STRING(8), unique: true })
-	code: string;
+  @Column({ type: DataType.STRING(8), unique: true })
+  code: string;
 
-	@Column({ defaultValue: false })
-	isDeleted: boolean;
+  @Column({ defaultValue: false })
+  isDeleted: boolean;
 
-	@Column({ defaultValue: false })
-	isArchived: boolean;
+  @Column({ defaultValue: false })
+  isArchived: boolean;
 
-	@Column({ type: DataType.ENUM('public', 'private'), defaultValue: 'public' })
-	visibility: string;
+  @Column({ type: DataType.ENUM('public', 'private'), defaultValue: 'public' })
+  visibility: string;
 
-	@BelongsToMany(() => Account, () => ClassAccount)
-	members: Array<Account & { details: ClassAccount }>;
+  @BelongsToMany(() => Account, () => ClassTeacher)
+  teachers: Array<Account & { detail: ClassTeacher }>;
+
+  @HasMany(() => ClassStudent)
+  students: Array<ClassStudent>;
+
+  @HasMany(() => PointPart)
+  grades: PointPart[];
+
+  @ForeignKey(() => Account)
+  @Column
+  ownerId: number;
+
+  @BelongsTo(() => Account, 'ownerId')
+  owner: Account;
+
+  role: string;
 }
