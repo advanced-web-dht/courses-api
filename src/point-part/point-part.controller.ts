@@ -65,18 +65,6 @@ export class PointPartController {
     }
   }
 
-  // @Get('/:id/:classId')
-  // async GetPointPartStudent(@Res() res: FastifyReply, @Param() param): Promise<void> {
-  //   const result = await this.pointpartService.GetPointPartWithListStudent(param.id, param.classId);
-  //   res.status(200).send({ result });
-  // }
-
-  // @Get('allpoint/:classId')
-  // async GetAllPointStudent(@Res() res: FastifyReply, @Param() param): Promise<void> {
-  //   const result = await this.pointpartService.GetAllWithListStudent(param.classId);
-  //   res.status(200).send(result);
-  // }
-
   @UseGuards(RolesGuard([Role.owner, Role.teacher]))
   @Patch('/:id/done')
   async MarkGradeDone(@Res() res: FastifyReply, @Param('id') id: number): Promise<void> {
@@ -133,8 +121,7 @@ export class PointPartController {
   @Get('/class/:classId/done')
   async GetDoneGrades(@Res() res: FastifyReply, @Req() req: FastifyRequest, @Param('classId') classId: number): Promise<void> {
     try {
-      const { id } = req.user;
-      const result = await this.pointpartService.GetDoneGradeOfClass(classId, id);
+      const result = await this.pointpartService.GetDoneGradeOfClass(classId);
       res.status(200).send(result);
     } catch (err) {
       res.status(500).send({ isSuccess: false });
