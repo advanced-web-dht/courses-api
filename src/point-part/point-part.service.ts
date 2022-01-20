@@ -58,16 +58,6 @@ export class PointPartService {
   }
 
   async UpdateOrder(order: Record<string, number>[]): Promise<void> {
-    // order.forEach(async (items) => {
-    // 	await this.pointpartModel.update(
-    // 		{ order: items.order as number },
-    // 		{
-    // 			where: {
-    // 				id: items.id
-    // 			}
-    // 		}
-    // 	);
-    // });
     const query = order.map((item) => {
       this.pointpartModel.update(
         { order: item.order as number },
@@ -80,27 +70,6 @@ export class PointPartService {
     });
     await Promise.all(query);
   }
-  // async GetPointPartWithListStudent(id: number, classId: number): Promise<Point[]> {
-  //   const result = await this.pointpartModel.findOne({
-  //     where: {
-  //       id: id,
-  //       classId: classId
-  //     },
-  //     include: [
-  //       {
-  //         model: Point,
-  //         include: [
-  //           {
-  //             model: Account,
-  //             attributes: ['studentId']
-  //           }
-  //         ],
-  //         attributes: ['point']
-  //       }
-  //     ]
-  //   });
-  //   return result.points;
-  // }
 
   async GetAllWithListStudent(classId: number): Promise<PointPart[]> {
     const result = await this.pointpartModel.findAll({
@@ -125,14 +94,16 @@ export class PointPartService {
   }
   async UpdateStatus(id: number, value: boolean): Promise<void> {
     const target = await this.pointpartModel.findOne({ where: { id } });
-    target.set({ isDone: true });
-    target.save();
-    const doneEvent: DoneEvent = {
-      classId: target.classId,
-      message: `Cột điểm ${target.name} đã hoàn thành. Bạn có thể xem trên phần điểm số của mình!!`,
-      topic: 'Điểm'
-    };
-    this.eventEmitter.emit('point-part.done', doneEvent);
+    target.set({ isDone: value });
+    await target.save();
+    if (value) {
+      const doneEvent: DoneEvent = {
+        classId: target.classId,
+        message: `Cột điểm ${target.name} đã hoàn thành. Bạn có thể xem trên phần điểm số của mình!!`,
+        topic: 'Điểm'
+      };
+      this.eventEmitter.emit('point-part.done', doneEvent);
+    }
   }
 
   async GetAllPoints(gradeId: number): Promise<Array<ClassStudent & { detail: Point }>> {
@@ -164,7 +135,8 @@ export class PointPartService {
             attributes: { exclude: ['createdAt', 'updatedAt'] }
           }
         }
-      ]
+      ],
+      order: [[{ model: PointPart, as: 'grades' }, 'order', 'ASC']]
     });
 
     result.grades.forEach((grade) => {
@@ -178,7 +150,7 @@ export class PointPartService {
     return result;
   }
 
-  async GetDoneGradeOfClass(classId: number, accountId: number): Promise<PointPart[]> {
+  async GetDoneGradeOfClass(classId: number): Promise<PointPart[]> {
     const result = await this.pointpartModel.findAll({
       where: { classId, isDone: true },
       include: [
@@ -186,7 +158,8 @@ export class PointPartService {
           model: Review,
           attributes: ['id']
         }
-      ]
+      ],
+      order: [['order', 'ASC']]
     });
     return result;
   }

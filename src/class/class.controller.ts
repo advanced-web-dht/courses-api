@@ -14,11 +14,7 @@ import { Role } from '../role/role.enum';
 
 @Controller('classes')
 export class ClassController {
-  constructor(
-    private readonly classService: ClassService,
-    private readonly mailService: MailService,
-    private readonly accountService: AccountService
-  ) {}
+  constructor(private readonly classService: ClassService, private readonly mailService: MailService) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
@@ -51,11 +47,11 @@ export class ClassController {
         const token = jwt.sign({ email }, process.env.SECRET_KEY, { expiresIn: '10h' });
         const inviteLink = `${process.env.CLIENT_URL}/enroll/${code}?token=${token}`;
 
-        await this.mailService.sendInvitationMail(email, inviteLink);
+        this.mailService.sendInvitationMail(email, inviteLink);
         res.status(200).send({ isSuccess: true });
       } else {
         const inviteLink = `${process.env.CLIENT_URL}/enroll/${code}`;
-        await this.mailService.sendInvitationMail(email, inviteLink);
+        this.mailService.sendInvitationMail(email, inviteLink);
         res.status(200).send({ isSuccess: true });
       }
     } catch (e) {
@@ -91,8 +87,8 @@ export class ClassController {
     @Param('classId') classId: number
   ): Promise<void> {
     try {
-      await this.classService.AddStudentList(body, classId);
-      res.status(201).send({ isSuccess: true });
+      const students = await this.classService.AddStudentList(body, classId);
+      res.status(201).send(students);
     } catch (e) {
       res.status(500).send({ isSuccess: false });
     }

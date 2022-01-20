@@ -114,12 +114,15 @@ export class ClassService {
     await this.classTeacher.create(classToAdd);
   }
 
-  async AddStudentList(students: Record<string, string | number>[], classId: number): Promise<void> {
+  async AddStudentList(students: Record<string, string | number>[], classId: number): Promise<ClassStudent[]> {
     const studentsToAdd = students.map((student) => {
       student.classId = classId;
       return student;
     });
-    this.classStudent.bulkCreate(studentsToAdd, { updateOnDuplicate: ['name'] });
+    const res = await this.classStudent.bulkCreate(studentsToAdd, { updateOnDuplicate: ['name'] }).then(async () => {
+      return await this.classStudent.findAll({ where: { classId }, include: [{ model: Account, attributes: ['id'] }] });
+    });
+    return res;
   }
 
   async getClassByCode(code: string, accountId: number): Promise<Class> {
@@ -323,6 +326,7 @@ export class ClassService {
         }
       ],
       order: [
+        [{ model: ClassStudent, as: 'students' }, 'studentId', 'ASC'],
         [{ model: ClassStudent, as: 'students' }, { model: PointPart, as: 'grades' }, 'order', 'ASC'],
         [{ model: PointPart, as: 'grades' }, 'order', 'ASC']
       ],
@@ -363,7 +367,7 @@ export class ClassService {
     return target;
   }
 
-  async GetClassByIdWithoutRole(id): Promise<Class> {
+  async GetClassByIdWithoutRole(id: number): Promise<Class> {
     const target = await this.classModel.findOne({
       where: { id },
       include: [
