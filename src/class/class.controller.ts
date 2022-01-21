@@ -47,11 +47,11 @@ export class ClassController {
         const token = jwt.sign({ email }, process.env.SECRET_KEY, { expiresIn: '10h' });
         const inviteLink = `${process.env.CLIENT_URL}/enroll/${code}?token=${token}`;
 
-        this.mailService.sendInvitationMail(email, inviteLink);
+        await this.mailService.sendInvitationMail(email, inviteLink);
         res.status(200).send({ isSuccess: true });
       } else {
         const inviteLink = `${process.env.CLIENT_URL}/enroll/${code}`;
-        this.mailService.sendInvitationMail(email, inviteLink);
+        await this.mailService.sendInvitationMail(email, inviteLink);
         res.status(200).send({ isSuccess: true });
       }
     } catch (e) {
