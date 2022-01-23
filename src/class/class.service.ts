@@ -10,7 +10,6 @@ import { Account } from '../account/account.entity';
 import { createClassDto } from './class.dto/create-class.dto';
 import { AccountLogin } from 'src/auth/auth.interface';
 import { PointPart } from '../point-part/point-part.entity';
-import { Point } from '../point/point.entity';
 import * as helper from './class.helper';
 
 @Injectable()

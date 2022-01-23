@@ -27,7 +27,7 @@ export class AuthController {
       if (result) {
         const token = jwt.sign({ email: body.email }, process.env.SECRET_KEY, { expiresIn: '10m' });
         const url = `${process.env.CLIENT_URL}/verify?token=${token}`;
-        this.mailService.sendAccountVerifyEmail(body.email, url);
+        await this.mailService.sendAccountVerifyEmail(body.email, url);
         res.status(201).send({ isSuccess: result });
       } else {
         res.status(400).send({ isSuccess: result });
@@ -56,7 +56,7 @@ export class AuthController {
   async RequestActivateAccount(@Res() res: FastifyReply, @Body('email') email: string): Promise<void> {
     const token = jwt.sign({ email: email }, process.env.SECRET_KEY, { expiresIn: '10m' });
     const url = `${process.env.CLIENT_URL}/verify?token=${token}`;
-    this.mailService.SendReactivateEmail(email, url);
+    await this.mailService.SendReactivateEmail(email, url);
     res.status(200).send({ isSuccess: true });
   }
 
@@ -92,7 +92,7 @@ export class AuthController {
       if (check) {
         const token = jwt.sign({ email: email }, process.env.SECRET_KEY, { expiresIn: '10m' });
         const url = `${process.env.CLIENT_URL}/forgot-password?token=${token}`;
-        this.mailService.SendResetPasswordEmail(email, url);
+        await this.mailService.SendResetPasswordEmail(email, url);
         res.status(200).send({ isSuccess: true });
       }
       return res.status(400).send({ isSuccess: false });

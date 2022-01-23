@@ -90,7 +90,7 @@ export class AuthService {
     }
   }
 
-  async ResetPassword(email: string, password): Promise<boolean> {
+  async ResetPassword(email: string, password: string): Promise<boolean> {
     try {
       const saltOrRounds = 10;
       const hash = await bcrypt.hash(password, saltOrRounds);

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
 
 import { PointService } from './point.service';
@@ -20,18 +20,4 @@ export class PointController {
       res.status(500).send({ isSuccess: false });
     }
   }
-
-  // @Post()
-  // async AddPoint(@Res() res: FastifyReply, @Body() body): Promise<void> {
-  //   try {
-  //     const result = await this.pointService.AddPoint(body);
-  //     res.status(201).send({ isSuccess: true });
-  //   } catch (err) {
-  //     if (err.parent.errno === 1062) {
-  //       res.status(409).send({ isSuccess: false });
-  //     } else {
-  //       res.status(500).send({ isSuccess: false });
-  //     }
-  //   }
-  // }
 }

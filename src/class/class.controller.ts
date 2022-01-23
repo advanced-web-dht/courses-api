@@ -7,7 +7,6 @@ import { ClassService } from './class.service';
 import { Class } from './class.entity';
 import { createClassDto } from './class.dto/create-class.dto';
 import { MailService } from '../mail/mail.service';
-import { AccountService } from '../account/account.service';
 import { Account } from '../account/account.entity';
 import { RolesGuard } from '../role/roles.guard';
 import { Role } from '../role/role.enum';
